@@ -35,4 +35,9 @@ export const todosApi = {
     return response.data.data
   },
 
+  // Delete a todo
+  deleteTodo: async (id: string): Promise<void> => {
+    await apiClient.delete(`/todos/${id}`)
+  },
+
 }

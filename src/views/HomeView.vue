@@ -36,14 +36,26 @@
         <div 
           v-for="todo in todos" 
           :key="todo._id"
-          class="bg-surface dark:bg-dark-surface rounded-lg shadow-sm p-6 mb-4 border border-border dark:border-dark-border"
+          class="bg-surface dark:bg-dark-surface rounded-lg shadow-sm p-6 mb-4 border border-border dark:border-dark-border flex items-start justify-between gap-4"
         >
-          <h3 class="text-base md:text-lg text-text-main dark:text-dark-text-main font-semibold mb-1">
-            {{ todo.title }}
-          </h3>
-          <p v-if="todo.description" class="text-sm text-text-secondary dark:text-dark-text-secondary">
-            {{ todo.description }}
-          </p>
+          <div class="flex-1 min-w-0">
+            <h3 class="text-base md:text-lg text-text-main dark:text-dark-text-main font-semibold mb-1">
+              {{ todo.title }}
+            </h3>
+            <p v-if="todo.description" class="text-sm text-text-secondary dark:text-dark-text-secondary">
+              {{ todo.description }}
+            </p>
+          </div>
+          
+          <button
+            @click="confirmDelete(todo)"
+            class="flex-shrink-0 p-2 text-text-secondary dark:text-dark-text-secondary hover:text-red-500 dark:hover:text-red-400 transition-colors rounded-lg hover:bg-background dark:hover:bg-dark-background"
+            title="Delete todo"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+            </svg>
+          </button>
         </div>
         
       </div>
@@ -83,12 +95,25 @@
         </div>
       </div>
     </div>
+
+    <!-- Delete Confirmation Modal -->
+    <ConfirmModal
+      :is-open="isDeleteModalOpen"
+      title="Delete Todo"
+      message="Are you sure you want to delete this todo?"
+      :loading="isDeleting"
+      loading-text="Deleting..."
+      variant="danger"
+      @confirm="handleDelete"
+      @cancel="cancelDelete"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { todosApi, type Todo } from '@/services/api'
+import ConfirmModal from '@/components/ConfirmModal.vue'
 
 const todos = ref<Todo[]>([])
 const newTodoTitle = ref('')
@@ -96,6 +121,9 @@ const newTodoDescription = ref('')
 const initialLoading = ref(false)
 const isAddingTodo = ref(false)
 const error = ref<string | null>(null)
+const isDeleteModalOpen = ref(false)
+const todoToDelete = ref<Todo | null>(null)
+const isDeleting = ref(false)
 
 onMounted(async () => {
   try {
@@ -130,6 +158,36 @@ const addTodo = async () => {
     console.error('Error creating todo:', err)
   } finally {
     isAddingTodo.value = false
+  }
+}
+
+const confirmDelete = (todo: Todo) => {
+  todoToDelete.value = todo
+  isDeleteModalOpen.value = true
+}
+
+const cancelDelete = () => {
+  isDeleteModalOpen.value = false
+  todoToDelete.value = null
+}
+
+const handleDelete = async () => {
+  if (!todoToDelete.value) return
+
+  try {
+    isDeleting.value = true
+    error.value = null
+    
+    await todosApi.deleteTodo(todoToDelete.value._id)
+    todos.value = todos.value.filter(t => t._id !== todoToDelete.value!._id)
+    
+    isDeleteModalOpen.value = false
+    todoToDelete.value = null
+  } catch (err) {
+    error.value = 'Failed to delete todo'
+    console.error('Error deleting todo:', err)
+  } finally {
+    isDeleting.value = false
   }
 }
 </script>
