@@ -17,6 +17,17 @@ export interface Todo {
   updatedAt: string
 }
 
+export interface CreateTodo {
+  title: string
+  description?: string
+}
+
+export interface UpdateTodo {
+  title?: string
+  description?: string
+  completed?: boolean
+}
+
 interface ApiResponse<T> {
   success: boolean
   data: T
@@ -29,13 +40,19 @@ export const todosApi = {
     return response.data.data
   },
 
-  // Create a new todo
-  createTodo: async (title: string, description = ''): Promise<Todo> => {
-    const response = await apiClient.post<ApiResponse<Todo>>('/todos', { title, description })
+  // Create one
+  createTodo: async (todo: CreateTodo): Promise<Todo> => {
+    const response = await apiClient.post<ApiResponse<Todo>>('/todos', todo)
     return response.data.data
   },
 
-  // Delete a todo
+  // Update one
+  updateTodo: async (id: string, todo: UpdateTodo): Promise<Todo> => {
+    const response = await apiClient.put<ApiResponse<Todo>>(`/todos/${id}`, todo)
+    return response.data.data
+  },
+
+  // Delete one
   deleteTodo: async (id: string): Promise<void> => {
     await apiClient.delete(`/todos/${id}`)
   },

@@ -69,7 +69,7 @@ import { computed } from 'vue'
 
 interface Props {
   isOpen: boolean
-  size?: 'sm' | 'md' | 'lg' | 'xl'
+  size?: 'sm' | 'md' | 'lg' | 'xl' | '2xl'
   closeOnBackdrop?: boolean
 }
 
@@ -85,7 +85,8 @@ const sizeClass = computed(() => {
     sm: 'max-w-sm',
     md: 'max-w-md',
     lg: 'max-w-lg',
-    xl: 'max-w-xl'
+    xl: 'max-w-xl',
+    '2xl': 'max-w-2xl'
   }
   return sizes[props.size]
 })
