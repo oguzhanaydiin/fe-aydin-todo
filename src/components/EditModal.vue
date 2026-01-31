@@ -14,26 +14,49 @@
     <template #body>
       <div class="flex flex-col gap-4">
         <div>
-          <label class="block text-sm font-medium text-text-main dark:text-dark-text-main mb-2">
-            Title*
-          </label>
+          <div class="flex justify-between items-center mb-2">
+            <label class="block text-sm font-medium text-text-main dark:text-dark-text-main">
+              Title*
+            </label>
+            <span class="text-xs text-text-secondary dark:text-dark-text-secondary" :class="{ 'text-red-500 dark:text-red-400': localTitle.length === 100 || localTitle.trim().length === 0 }"	>
+              {{ localTitle.length }}/100
+            </span>
+          </div>
           <input
             v-model="localTitle"
             type="text"
             placeholder="Title*"
+            maxlength="100"
             :disabled="loading"
-            class="w-full px-3 py-2 bg-background dark:bg-dark-background text-text-main dark:text-dark-text-main border border-border dark:border-dark-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary dark:focus:ring-dark-primary disabled:opacity-50"
+            :class="[
+              'w-full px-3 py-2 bg-background dark:bg-dark-background text-text-main dark:text-dark-text-main rounded-lg focus:outline-none focus:ring-2 disabled:opacity-50 transition-colors',
+              localTitle.trim().length === 0 && localTitle.length > 0
+                ? 'border-2 border-red-500 dark:border-red-400 focus:ring-red-500 dark:focus:ring-red-400'
+                : 'border border-border dark:border-dark-border focus:ring-primary dark:focus:ring-dark-primary'
+            ]"
           />
+          <p 
+            v-if="localTitle.trim().length === 0 || localTitle.trim().length === 0 && localTitle.length > 0"
+            class="mt-1 text-xs text-red-500 dark:text-red-400"
+          >
+            Title cannot be empty or contain only spaces
+          </p>
         </div>
         <div>
-          <label class="block text-sm font-medium text-text-main dark:text-dark-text-main mb-2">
-            Description
-          </label>
+          <div class="flex justify-between items-center mb-2">
+            <label class="block text-sm font-medium text-text-main dark:text-dark-text-main">
+              Description
+            </label>
+            <span class="text-xs text-text-secondary dark:text-dark-text-secondary" :class="{ 'text-red-500 dark:text-red-400': localDescription.length === 100 || localDescription.trim().length === 0 }">
+              {{ localDescription.length }}/100
+            </span>
+          </div>
           <textarea
             v-model="localDescription"
             placeholder="Description"
             :disabled="loading"
             rows="3"
+            maxlength="100"
             class="w-full px-3 py-2 bg-background dark:bg-dark-background text-text-main dark:text-dark-text-main border border-border dark:border-dark-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary dark:focus:ring-dark-primary disabled:opacity-50 resize-none"
           />
         </div>
