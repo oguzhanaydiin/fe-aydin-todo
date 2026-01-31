@@ -22,14 +22,14 @@
         <button
           @click="onCancel"
           :disabled="loading"
-          class="px-4 py-2 rounded-lg font-medium transition-colors disabled:opacity-50 text-text-main dark:text-dark-text-main border border-border dark:border-dark-border hover:bg-background dark:hover:bg-dark-background"
+          class="w-24 px-4 py-2 rounded-lg font-medium transition-colors disabled:opacity-50 text-text-main dark:text-dark-text-main border border-border dark:border-dark-border hover:bg-background dark:hover:bg-dark-background"
         >
           {{ cancelText }}
         </button>
         <button
           @click="onConfirm"
           :disabled="loading"
-          class="px-4 py-2 rounded-lg font-medium transition-opacity disabled:opacity-50"
+          class="w-28 px-4 py-2 rounded-lg font-medium transition-opacity disabled:opacity-50"
           :class="confirmClass"
         >
           {{ loading ? loadingText : confirmText }}
@@ -43,23 +43,39 @@
 import { computed } from 'vue'
 import BaseModal from './BaseModal.vue'
 
-interface Props {
-  isOpen: boolean
-  title: string
-  message: string
-  confirmText?: string
-  cancelText?: string
-  loadingText?: string
-  loading?: boolean
-  variant?: 'danger' | 'primary'
-}
-
-const props = withDefaults(defineProps<Props>(), {
-  confirmText: 'Yes',
-  cancelText: 'No',
-  loadingText: 'Please wait...',
-  loading: false,
-  variant: 'danger'
+const props = defineProps({
+  isOpen: {
+    type: Boolean,
+    required: true
+  },
+  title: {
+    type: String,
+    required: true
+  },
+  message: {
+    type: String,
+    required: true
+  },
+  confirmText: {
+    type: String,
+    default: 'Yes'
+  },
+  cancelText: {
+    type: String,
+    default: 'No'
+  },
+  loadingText: {
+    type: String,
+    default: 'Please wait...'
+  },
+  loading: {
+    type: Boolean,
+    default: false
+  },
+  variant: {
+    type: String as () => 'danger' | 'primary',
+    default: 'danger'
+  }
 })
 
 const emit = defineEmits(['confirm', 'cancel'])

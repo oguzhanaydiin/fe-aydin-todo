@@ -45,14 +45,14 @@
         <button
           @click="onCancel"
           :disabled="loading"
-          class="px-4 py-2 rounded-lg font-medium transition-colors disabled:opacity-50 text-text-main dark:text-dark-text-main border border-border dark:border-dark-border hover:bg-background dark:hover:bg-dark-background"
+          class="w-24 px-4 py-2 rounded-lg font-medium transition-colors disabled:opacity-50 text-text-main dark:text-dark-text-main border border-border dark:border-dark-border hover:bg-background dark:hover:bg-dark-background"
         >
           Cancel
         </button>
         <button
           @click="onSave"
           :disabled="!localTitle.trim() || loading"
-          class="px-4 py-2 rounded-lg font-medium transition-opacity disabled:opacity-50 bg-primary dark:bg-dark-primary text-white hover:enabled:opacity-90"
+          class="w-24 px-4 py-2 rounded-lg font-medium transition-opacity disabled:opacity-50 bg-primary dark:bg-dark-primary text-white hover:enabled:opacity-90"
         >
           {{ loading ? 'Saving...' : 'Save' }}
         </button>
@@ -65,15 +65,23 @@
 import { ref, watch } from 'vue'
 import BaseModal from './BaseModal.vue'
 
-interface Props {
-  isOpen: boolean
-  title: string
-  description: string
-  loading?: boolean
-}
-
-const props = withDefaults(defineProps<Props>(), {
-  loading: false
+const props = defineProps({
+  isOpen: {
+    type: Boolean,
+    required: true
+  },
+  title: {
+    type: String,
+    required: true
+  },
+  description: {
+    type: String,
+    required: true
+  },
+  loading: {
+    type: Boolean,
+    default: false
+  }
 })
 
 const emit = defineEmits(['save', 'cancel'])
