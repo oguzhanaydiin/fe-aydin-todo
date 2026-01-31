@@ -57,10 +57,10 @@
             </button>
 
             <div class="flex-1 min-w-0">
-              <h3 class="text-base md:text-lg text-text-main dark:text-dark-text-main font-semibold mb-1">
+              <h3 class="text-base md:text-lg text-text-main dark:text-dark-text-main font-semibold mb-1 break-words">
                 {{ todo.title }}
               </h3>
-              <p v-if="todo.description" class="text-sm text-text-secondary dark:text-dark-text-secondary">
+              <p v-if="todo.description" class="text-sm text-text-secondary dark:text-dark-text-secondary break-words">
                 {{ todo.description }}
               </p>
             </div>
@@ -113,10 +113,10 @@
                 </button>
 
                 <div class="flex-1 min-w-0">
-                  <h3 class="text-base md:text-lg text-text-main dark:text-dark-text-main font-semibold mb-1 line-through">
+                  <h3 class="text-base md:text-lg text-text-main dark:text-dark-text-main font-semibold mb-1 line-through break-words">
                     {{ todo.title }}
                   </h3>
-                  <p v-if="todo.description" class="text-sm text-text-secondary dark:text-dark-text-secondary line-through">
+                  <p v-if="todo.description" class="text-sm text-text-secondary dark:text-dark-text-secondary line-through break-words">
                     {{ todo.description }}
                   </p>
                 </div>
@@ -143,23 +143,39 @@
       <div class="w-full max-w-6xl mx-auto px-4 md:px-6 lg:px-8 pb-4 md:pb-6 lg:pb-8">
         <div class="bg-surface dark:bg-dark-surface rounded-lg shadow-sm p-6 border border-border dark:border-dark-border">
           <div class="flex flex-col gap-2">
-            <input
-              v-model="newTodoTitle"
-              @keyup.enter="newTodoDescription ? addTodo() : null"
-              type="text"
-              placeholder="Title..."
-              :disabled="isAddingTodo"
-              class="bg-transparent text-base md:text-lg text-text-main dark:text-dark-text-main placeholder-text-secondary dark:placeholder-dark-text-secondary focus:outline-none disabled:opacity-50 font-semibold"
-            />
+            <div class="flex items-center gap-2">
+              <input
+                v-model="newTodoTitle"
+                @keyup.enter="newTodoDescription ? addTodo() : null"
+                type="text"
+                placeholder="Title..."
+                maxlength="100"
+                :disabled="isAddingTodo"
+                class="flex-1 bg-transparent text-base md:text-lg text-text-main dark:text-dark-text-main placeholder-text-secondary dark:placeholder-dark-text-secondary focus:outline-none disabled:opacity-50 font-semibold"
+              />
+              <span 
+                v-if="newTodoTitle.length === 100"
+                class="text-xs text-red-500 dark:text-red-400 font-medium flex-shrink-0"
+              >
+                100/100
+              </span>
+            </div>
             <div class="flex gap-2 items-center">
               <input
                 v-model="newTodoDescription"
                 @keyup.enter="addTodo"
                 type="text"
                 placeholder="Description (optional)..."
+                maxlength="100"
                 :disabled="isAddingTodo"
                 class="flex-1 bg-transparent text-xs md:text-sm text-text-main dark:text-dark-text-main placeholder-text-secondary dark:placeholder-dark-text-secondary focus:outline-none disabled:opacity-50"
               />
+              <span 
+                v-if="newTodoDescription.length === 100"
+                class="text-xs text-red-500 dark:text-red-400 font-medium flex-shrink-0"
+              >
+                100/100
+              </span>
               <button
                 @click="addTodo"
                 :disabled="!newTodoTitle.trim() || isAddingTodo"
