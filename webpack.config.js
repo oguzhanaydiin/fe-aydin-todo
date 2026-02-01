@@ -48,9 +48,7 @@ module.exports = {
     new HtmlWebpackPlugin({
       template: './public/index.html'
     }),
-    new Dotenv({
-      path: process.env.NODE_ENV === 'production' ? './.env.production' : './.env'
-    })
+    new Dotenv()
   ],
   resolve: {
     alias: {
