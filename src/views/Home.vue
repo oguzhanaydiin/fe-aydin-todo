@@ -230,7 +230,7 @@
 <script lang="ts">
 import Vue from 'vue'
 import { Icon } from '@iconify/vue2'
-import { todosApi, type Todo } from '@/services/api'
+import { type Todo } from '@/services/api'
 import EditModal from '@/components/EditModal.vue'
 import ConfirmModal from '@/components/ConfirmModal.vue'
 import ListDropdown from '@/components/ListDropdown.vue'
@@ -245,14 +245,11 @@ export default Vue.extend({
   },
   data() {
     return {
-      allTodos: [] as Todo[],
       showCompleted: true,
       newTodoTitle: '',
       newTodoDescription: '',
       selectedListName: 'General',
-      initialLoading: false,
       isAddingTodo: false,
-      error: null as string | null,
       isEditModalOpen: false,
       todoToEdit: null as Todo | null,
       editTitle: '',
@@ -266,6 +263,15 @@ export default Vue.extend({
   computed: {
     currentListName(): string | null {
       return this.$route.params.list ? this.$route.params.list.replace(/_/g, ' ') : null
+    },
+    allTodos(): Todo[] {
+      return this.$store.getters['todos/all']
+    },
+    initialLoading(): boolean {
+      return this.$store.getters['todos/loading']
+    },
+    error(): string | null {
+      return this.$store.getters['todos/error']
     },
     filteredTodos(): Todo[] {
       const listName = this.currentListName
@@ -283,44 +289,38 @@ export default Vue.extend({
     }
   },
   async mounted() {
-    await this.fetchTodos()
     // Set the dropdown to match the current list on initial load
     this.selectedListName = this.currentListName || 'General'
+    // Update page title
+    this.updatePageTitle()
   },
   watch: {
     '$route'() {
       // When route changes, update the dropdown to match current list
       this.selectedListName = this.currentListName || 'General'
+      // Update page title
+      this.updatePageTitle()
     }
   },
   methods: {
-    async fetchTodos() {
-      try {
-        this.initialLoading = true
-        this.error = null
-        this.allTodos = await todosApi.getTodos()
-      } catch (err) {
-        this.error = 'Failed to load todos'
-        console.error('Error fetching todos:', err)
-      } finally {
-        this.initialLoading = false
-      }
+    updatePageTitle() {
+      const listName = this.currentListName
+      document.title = listName ? `${listName} - AydinTodo` : 'AydinTodo'
     },
     async addTodo() {
       if (!this.newTodoTitle.trim()) return
 
       try {
         this.isAddingTodo = true
-        this.error = null
-
+        
+        // Use the selectedListName from dropdown
         const listName = this.selectedListName || 'General'
         
-        const newTodo = await todosApi.createTodo({
+        await this.$store.dispatch('todos/addTodo', {
           title: this.newTodoTitle.trim(),
           description: this.newTodoDescription.trim(),
           listName: listName
         })
-        this.allTodos.push(newTodo)
         
         this.newTodoTitle = ''
         this.newTodoDescription = ''
@@ -328,16 +328,17 @@ export default Vue.extend({
         // Navigate to the list if it's different from the current one
         const currentListOrGeneral = this.currentListName || 'General'
         if (listName !== currentListOrGeneral) {
+          // Navigate to the new list
           if (listName === 'General') {
             this.$router.push('/')
           } else {
             this.$router.push(`/${listName.replace(/ /g, '_')}`)
           }
         } else {
+          // Reset selectedListName to current list if staying on the same page
           this.selectedListName = this.currentListName || 'General'
         }
       } catch (err) {
-        this.error = 'Failed to create todo'
         console.error('Error creating todo:', err)
       } finally {
         this.isAddingTodo = false
@@ -357,17 +358,11 @@ export default Vue.extend({
     },
     async toggleComplete(todo: Todo) {
       try {
-        this.error = null
-        
-        const updatedTodo = await todosApi.updateTodo(todo._id, {
-          completed: !todo.completed
+        await this.$store.dispatch('todos/updateTodo', {
+          id: todo._id,
+          updates: { completed: !todo.completed }
         })
-        
-        this.allTodos = this.allTodos.map(t => 
-          t._id === todo._id ? updatedTodo : t
-        )
       } catch (err) {
-        this.error = 'Failed to update todo'
         console.error('Error updating todo:', err)
       }
     },
@@ -378,24 +373,20 @@ export default Vue.extend({
 
       try {
         this.isEditing = true
-        this.error = null
         
-        const updatedTodo = await todosApi.updateTodo(todoId, {
-          title: data.title,
-          description: data.description
+        await this.$store.dispatch('todos/updateTodo', {
+          id: todoId,
+          updates: {
+            title: data.title,
+            description: data.description
+          }
         })
-        
-        // Update the todos array
-        this.allTodos = this.allTodos.map(t => 
-          t._id === todoId ? updatedTodo : t
-        )
         
         this.isEditModalOpen = false
         this.todoToEdit = null
         this.editTitle = ''
         this.editDescription = ''
       } catch (err) {
-        this.error = 'Failed to update todo'
         console.error('Error updating todo:', err)
       } finally {
         this.isEditing = false
@@ -416,15 +407,12 @@ export default Vue.extend({
 
       try {
         this.isDeleting = true
-        this.error = null
         
-        await todosApi.deleteTodo(todoId)
-        this.allTodos = this.allTodos.filter(t => t._id !== todoId)
+        await this.$store.dispatch('todos/deleteTodo', todoId)
         
         this.isDeleteModalOpen = false
         this.todoToDelete = null
       } catch (err) {
-        this.error = 'Failed to delete todo'
         console.error('Error deleting todo:', err)
       } finally {
         this.isDeleting = false

@@ -4,6 +4,7 @@ import { Icon } from '@iconify/vue2'
 import ColorModeToggle from '@/components/ColorModeToggle.vue'
 import MobileDrawer from '@/components/MobileDrawer.vue'
 import NewListModal from '@/components/NewListModal.vue'
+import ConfirmModal from '@/components/ConfirmModal.vue'
 
 export default Vue.extend({
   name: 'App',
@@ -11,25 +12,64 @@ export default Vue.extend({
     Icon,
     ColorModeToggle,
     MobileDrawer,
-    NewListModal
+    NewListModal,
+    ConfirmModal
   },
   data() {
     return {
       isMobileMenuOpen: false,
       isNewListModalOpen: false,
       isCreatingList: false,
-      createError: null as string | null
+      createError: null as string | null,
+      isDeleteListModalOpen: false,
+      listToDelete: null as string | null,
+      isDeletingList: false
     }
   },
   computed: {
     lists(): string[] {
       return this.$store.getters['lists/all']
+    },
+    allTodos(): any[] {
+      return this.$store.getters['todos/all']
     }
   },
-  mounted() {
+  async mounted() {
     this.$store.dispatch('init')
   },
   methods: {
+    listHasTodos(listName: string): boolean {
+      return this.allTodos.some(todo => todo.listName === listName)
+    },
+    confirmDeleteList(listName: string) {
+      this.listToDelete = listName
+      this.isDeleteListModalOpen = true
+    },
+    cancelDeleteList() {
+      this.isDeleteListModalOpen = false
+      this.listToDelete = null
+    },
+    async handleDeleteList() {
+      if (!this.listToDelete) return
+
+      try {
+        this.isDeletingList = true
+        await this.$store.dispatch('lists/deleteList', this.listToDelete)
+        
+        // Navigate to General if we're currently on the deleted list
+        const currentListName = this.$route.params.list ? this.$route.params.list.replace(/_/g, ' ') : null
+        if (currentListName === this.listToDelete) {
+          this.$router.push('/')
+        }
+        
+        this.isDeleteListModalOpen = false
+        this.listToDelete = null
+      } catch (error: any) {
+        console.error('Error deleting list:', error)
+      } finally {
+        this.isDeletingList = false
+      }
+    },
     openNewListModal() {
       this.isNewListModalOpen = true
       this.createError = null
@@ -68,20 +108,28 @@ export default Vue.extend({
       >
         <Icon icon="heroicons-outline:menu" class="w-6 h-6 text-text-main dark:text-dark-text-main" />
       </button>
-      <h1 class="ml-3 text-lg font-bold text-text-main dark:text-dark-text-main">AydinTodo</h1>
+      <h1 class="ml-3 text-lg font-bold text-text-main dark:text-dark-text-main flex items-center gap-0.5">
+        <Icon icon="heroicons-outline:clipboard-document-list" class="w-5 h-5 text-emerald-700 dark:text-emerald-600" />
+        AydinTodo
+      </h1>
     </div>
 
     <!-- mobile navigation -->
     <MobileDrawer
       :is-open="isMobileMenuOpen"
+      :all-todos="allTodos"
       @close="isMobileMenuOpen = false"
       @open-new-list="openNewListModal"
+      @delete-list="confirmDeleteList"
     />
 
     <!-- desktop sidebar -->
     <nav class="hidden md:flex md:flex-col w-64 bg-surface dark:bg-dark-surface text-text-main dark:text-dark-text-main border-r border-border dark:border-dark-border">
       <div class="p-4 border-b border-border dark:border-dark-border flex items-center justify-between">
-        <h1 class="text-xl font-bold">AydinTodo</h1>
+        <h1 class="text-xl font-bold flex items-center gap-0.5">
+          <Icon icon="heroicons-outline:clipboard-document-list" class="w-6 h-6 text-emerald-700 dark:text-emerald-600" />
+          AydinTodo
+        </h1>
         <ColorModeToggle />
       </div>
       
@@ -90,20 +138,38 @@ export default Vue.extend({
           <li>
             <router-link 
               to="/"
-              class="block px-4 py-2 rounded hover:bg-primary hover:text-white dark:hover:bg-dark-primary transition-colors"
-              active-class="bg-primary text-white dark:bg-dark-primary"
+              class="flex items-center justify-between px-4 py-2 rounded transition-colors group hover:bg-primary hover:text-white dark:hover:bg-dark-primary"
+              active-class="!bg-primary !text-white dark:!bg-dark-primary"
               exact
             >
-              General
+              <div class="flex items-center gap-2">
+                <span>General</span>
+                <span class="text-xs font-medium px-1.5 py-0.5 rounded bg-border dark:bg-dark-border">
+                  {{ allTodos.filter(t => !t.listName || t.listName === '' || t.listName === 'General').length }}
+                </span>
+              </div>
             </router-link>
           </li>
           <li v-for="listName in lists" :key="listName">
             <router-link 
               :to="`/${listName.replace(/ /g, '_')}`"
-              class="block px-4 py-2 rounded hover:bg-primary hover:text-white dark:hover:bg-dark-primary transition-colors"
-              active-class="bg-primary text-white dark:bg-dark-primary"
+              class="flex items-center justify-between px-4 py-2 rounded transition-colors group hover:bg-primary hover:text-white dark:hover:bg-dark-primary"
+              active-class="!bg-primary !text-white dark:!bg-dark-primary"
             >
-              {{ listName }}
+              <div class="flex items-center gap-2">
+                <span>{{ listName }}</span>
+                <span class="text-xs font-medium px-1.5 py-0.5 rounded bg-border dark:bg-dark-border">
+                  {{ allTodos.filter(t => t.listName === listName).length }}
+                </span>
+              </div>
+              <button
+                v-if="!listHasTodos(listName)"
+                @click.stop.prevent="confirmDeleteList(listName)"
+                class="p-1 text-text-secondary dark:text-dark-text-secondary hover:text-red-500 dark:hover:text-red-400 transition-colors rounded group-hover:text-white group-hover:hover:text-red-400"
+                title="Delete list"
+              >
+                <Icon icon="heroicons-outline:trash" class="h-4 w-4" />
+              </button>
             </router-link>
           </li>
         </ul>
@@ -132,6 +198,18 @@ export default Vue.extend({
       :external-error="createError"
       @save="handleNewList"
       @cancel="cancelNewList"
+    />
+
+    <!-- Delete List Modal -->
+    <ConfirmModal
+      :is-open="isDeleteListModalOpen"
+      title="Delete List"
+      :message="`Are you sure you want to delete '${listToDelete}'?`"
+      :loading="isDeletingList"
+      loading-text="Deleting..."
+      variant="danger"
+      @confirm="handleDeleteList"
+      @cancel="cancelDeleteList"
     />
   </div>
 </template>

@@ -14,7 +14,10 @@
     >
       <!-- Header -->
       <div class="p-4 border-b border-border dark:border-dark-border flex items-center justify-between">
-        <h1 class="text-xl font-bold">AydinTodo</h1>
+        <h1 class="text-xl font-bold flex items-center gap-0.5">
+          <Icon icon="heroicons-outline:clipboard-document-list" class="w-6 h-6 text-emerald-700 dark:text-emerald-600" />
+          AydinTodo
+        </h1>
         <div class="flex items-center gap-2">
           <ColorModeToggle />
           <button
@@ -33,22 +36,40 @@
           <li>
             <router-link
             to="/"
-            class="block px-4 py-2 rounded hover:bg-primary hover:text-white dark:hover:bg-dark-primary transition-colors"
-            active-class="bg-primary text-white dark:bg-dark-primary"
+            class="flex items-center justify-between px-4 py-2 rounded transition-colors group hover:bg-primary hover:text-white dark:hover:bg-dark-primary"
+            active-class="!bg-primary !text-white dark:!bg-dark-primary"
             @click.native="close"
             exact
             >
-              General
+              <div class="flex items-center gap-2">
+                <span>General</span>
+                <span class="text-xs font-medium px-1.5 py-0.5 rounded bg-border dark:bg-dark-border">
+                  {{ getTodoCount('General') }}
+                </span>
+              </div>
             </router-link>
           </li>
           <li v-for="listName in lists" :key="listName">
             <router-link
             :to="`/${listName.replace(/ /g, '_')}`"
-            class="block px-4 py-2 rounded hover:bg-primary hover:text-white dark:hover:bg-dark-primary transition-colors"
-            active-class="bg-primary text-white dark:bg-dark-primary"
+            class="flex items-center justify-between px-4 py-2 rounded transition-colors group hover:bg-primary hover:text-white dark:hover:bg-dark-primary"
+            active-class="!bg-primary !text-white dark:!bg-dark-primary"
             @click.native="close"
             >
-              {{ listName }}
+              <div class="flex items-center gap-2">
+                <span>{{ listName }}</span>
+                <span class="text-xs font-medium px-1.5 py-0.5 rounded bg-border dark:bg-dark-border">
+                  {{ getTodoCount(listName) }}
+                </span>
+              </div>
+              <button
+                v-if="!listHasTodos(listName)"
+                @click.stop.prevent="deleteList(listName)"
+                class="p-1 text-text-secondary dark:text-dark-text-secondary hover:text-red-500 dark:hover:text-red-400 transition-colors rounded group-hover:text-white group-hover:hover:text-red-400"
+                title="Delete list"
+              >
+                <Icon icon="heroicons-outline:trash" class="h-4 w-4" />
+              </button>
             </router-link>
           </li>
         </ul>
@@ -83,6 +104,10 @@ export default Vue.extend({
     isOpen: {
       type: Boolean,
       required: true
+    },
+    allTodos: {
+      type: Array,
+      default: () => []
     }
   },
   data() {
@@ -112,6 +137,19 @@ export default Vue.extend({
     }
   },
   methods: {
+    getTodoCount(listName: string): number {
+      const todos = this.allTodos as any[]
+      if (listName === 'General') {
+        return todos.filter(t => !t.listName || t.listName === '' || t.listName === 'General').length
+      }
+      return todos.filter(t => t.listName === listName).length
+    },
+    listHasTodos(listName: string): boolean {
+      return (this.allTodos as any[]).some((todo: any) => todo.listName === listName)
+    },
+    deleteList(listName: string): void {
+      this.$emit('delete-list', listName)
+    },
     close(): void {
       this.$emit('close')
     },
