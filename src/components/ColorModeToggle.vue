@@ -1,25 +1,28 @@
 <template>
   <button 
     @click="toggleTheme"
-    class="w-full px-4 py-2 rounded bg-primary hover:bg-primary-hover dark:bg-dark-primary dark:hover:bg-dark-primary-hover transition-colors text-white font-medium"
+    class="p-2 bg-primary dark:bg-dark-primary text-white hover:opacity-90 rounded-lg transition-all"
+    :title="isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode'"
   >
-    {{ isDark ? 'Light Mode' : 'Dark Mode' }}
+    <Icon :icon="isDark ? 'heroicons-outline:sun' : 'heroicons-outline:moon'" class="w-5 h-5" />
   </button>
 </template>
 
 <script lang="ts">
 import Vue from 'vue'
+import { Icon } from '@iconify/vue2'
 
 export default Vue.extend({
   name: 'ColorModeToggle',
+  components: { Icon },
   computed: {
     isDark(): boolean {
-      return this.$store.getters.isDark
+      return this.$store.getters['theme/isDark']
     }
   },
   methods: {
     toggleTheme(): void {
-      this.$store.dispatch('toggle')
+      this.$store.dispatch('theme/toggle')
     }
   }
 })

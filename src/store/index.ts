@@ -1,40 +1,21 @@
 import Vue from 'vue';
 import Vuex, { StoreOptions } from 'vuex';
 import { RootState } from './types';
+import themeModule from './modules/theme';
+import listsModule from './modules/lists';
 
 Vue.use(Vuex);
 
 const store: StoreOptions<RootState> = {
-  state: {
-    isDark: false
-  },
-  mutations: {
-    SET_THEME(state, isDark: boolean) {
-      state.isDark = isDark;
-    }
+  modules: {
+    theme: themeModule,
+    lists: listsModule
   },
   actions: {
-    init({ commit }) {
-      const saved = localStorage.getItem('theme');
-      if (saved === 'dark') {
-        commit('SET_THEME', true);
-        document.documentElement.classList.add('dark');
-      }
-    },
-    toggle({ commit, state }) {
-      const newTheme = !state.isDark;
-      commit('SET_THEME', newTheme);
-      localStorage.setItem('theme', newTheme ? 'dark' : 'light');
-
-      if (newTheme) {
-        document.documentElement.classList.add('dark');
-      } else {
-        document.documentElement.classList.remove('dark');
-      }
+    init({ dispatch }) {
+      dispatch('theme/init');
+      dispatch('lists/fetchLists');
     }
-  },
-  getters: {
-    isDark: (state) => state.isDark
   }
 };
 

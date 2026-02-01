@@ -9,6 +9,11 @@ const routes: Array<RouteConfig> = [
     path: '/',
     name: 'home',
     component: Home
+  },
+  {
+    path: '/:list',
+    name: 'list',
+    component: Home
   }
 ]
 

@@ -15,15 +15,16 @@
       <!-- Header -->
       <div class="p-4 border-b border-border dark:border-dark-border flex items-center justify-between">
         <h1 class="text-xl font-bold">AydinTodo</h1>
-        <button
-          @click="close"
-          class="p-2 hover:bg-background dark:hover:bg-dark-background rounded-lg transition-colors"
-          aria-label="Close menu"
+        <div class="flex items-center gap-2">
+          <ColorModeToggle />
+          <button
+            @click="close"
+            class="p-2 hover:bg-background dark:hover:bg-dark-background rounded-lg transition-colors"
+            aria-label="Close menu"
           >
-          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-          </svg>
-        </button>
+            <Icon icon="heroicons-outline:x" class="w-6 h-6" />
+          </button>
+        </div>
       </div>
 
       <!-- Navigation -->
@@ -35,8 +36,19 @@
             class="block px-4 py-2 rounded hover:bg-primary hover:text-white dark:hover:bg-dark-primary transition-colors"
             active-class="bg-primary text-white dark:bg-dark-primary"
             @click.native="close"
+            exact
             >
               General
+            </router-link>
+          </li>
+          <li v-for="list in lists" :key="list">
+            <router-link
+            :to="`/${encodeURIComponent(list)}`"
+            class="block px-4 py-2 rounded hover:bg-primary hover:text-white dark:hover:bg-dark-primary transition-colors"
+            active-class="bg-primary text-white dark:bg-dark-primary"
+            @click.native="close"
+            >
+              {{ list }}
             </router-link>
           </li>
         </ul>
@@ -44,7 +56,13 @@
 
       <!-- Footer -->
       <div class="p-4 border-t border-border dark:border-dark-border">
-        <ColorModeToggle />
+        <button
+          @click="openNewListModal"
+          class="w-full px-4 py-2 rounded border-2 border-dashed border-border dark:border-dark-border hover:border-primary dark:hover:border-dark-primary hover:bg-background dark:hover:bg-dark-background transition-colors flex items-center justify-center gap-2 text-text-secondary dark:text-dark-text-secondary hover:text-primary dark:hover:text-dark-primary"
+        >
+          <Icon icon="heroicons-outline:plus" class="h-4 w-4" />
+          <span class="text-sm font-medium">New List</span>
+        </button>
       </div>
     </nav>
   </div>
@@ -52,11 +70,13 @@
 
 <script lang="ts">
 import Vue from 'vue'
+import { Icon } from '@iconify/vue2'
 import ColorModeToggle from '@/components/ColorModeToggle.vue'
 
 export default Vue.extend({
   name: 'MobileDrawer',
   components: {
+    Icon,
     ColorModeToggle
   },
   props: {
@@ -69,6 +89,11 @@ export default Vue.extend({
     return {
       isVisible: false,
       isAnimating: false
+    }
+  },
+  computed: {
+    lists(): string[] {
+      return this.$store.getters['lists/all']
     }
   },
   watch: {
@@ -89,6 +114,10 @@ export default Vue.extend({
   methods: {
     close(): void {
       this.$emit('close')
+    },
+    openNewListModal(): void {
+      this.close()
+      this.$emit('open-new-list')
     }
   }
 })

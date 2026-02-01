@@ -9,6 +9,7 @@
     "lint": "eslint . --ext .vue,.js,.ts --fix"
   },
   "dependencies": {
+    "@iconify/vue2": "^2.1.0",
     "axios": "^1.13.4",
     "vue": "2.6.14",
     "vue-router": "^3.5.4",
@@ -18,13 +19,13 @@
     "@babel/core": "^7.16.0",
     "@babel/preset-env": "^7.16.0",
     "@types/node": "^16.11.45",
+    "@vue/eslint-config-typescript": "^11.0.0",
     "autoprefixer": "^10.4.15",
     "babel-loader": "^8.2.3",
     "css-loader": "^6.5.1",
     "dotenv-webpack": "^8.0.1",
     "eslint": "^8.5.0",
     "eslint-plugin-vue": "^9.0.0",
-    "@vue/eslint-config-typescript": "^11.0.0",
     "file-loader": "^6.2.0",
     "html-webpack-plugin": "^5.5.0",
     "postcss": "^8.4.31",

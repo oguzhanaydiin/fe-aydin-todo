@@ -5,9 +5,9 @@
       @click.stop="isOpen = !isOpen"
       :disabled="disabled"
       class="flex items-center gap-1.5 px-3 py-1.5 text-sm text-text-secondary dark:text-dark-text-secondary hover:text-primary dark:hover:text-dark-primary transition-colors rounded-md border border-border dark:border-dark-border hover:border-primary dark:hover:border-dark-primary disabled:opacity-50"
-      title="Category"
+      title="List"
     >
-      <IconFolder class="h-4 w-4" />
+      <Icon icon="heroicons-outline:folder" class="h-4 w-4" />
       <span>{{ value || 'General' }}</span>
     </button>
     
@@ -16,14 +16,23 @@
     <div
       v-if="isOpen"
       :style="position"
-      class="fixed bg-surface dark:bg-dark-surface border border-border dark:border-dark-border rounded-lg shadow-lg py-1 z-50 min-w-[150px]"
+      class="fixed bg-surface dark:bg-dark-surface border border-border dark:border-dark-border rounded-lg shadow-lg py-1 z-50 min-w-[150px] divide-y divide-border dark:divide-dark-border"
     >
       <button
-        @click.stop="selectCategory('')"
+        @click.stop="selectList('')"
         class="w-full px-4 py-2 text-left text-sm hover:bg-background dark:hover:bg-dark-background transition-colors"
         :class="value === '' ? 'text-primary dark:text-dark-primary font-medium' : 'text-text-main dark:text-dark-text-main'"
       >
         General
+      </button>
+      <button
+        v-for="list in lists"
+        :key="list"
+        @click.stop="selectList(list)"
+        class="w-full px-4 py-2 text-left text-sm hover:bg-background dark:hover:bg-dark-background transition-colors"
+        :class="value === list ? 'text-primary dark:text-dark-primary font-medium' : 'text-text-main dark:text-dark-text-main'"
+      >
+        {{ list }}
       </button>
     </div>
   </div>
@@ -31,11 +40,11 @@
 
 <script lang="ts">
 import Vue from 'vue'
-import IconFolder from './icons/IconFolder.vue'
+import { Icon } from '@iconify/vue2'
 
 export default Vue.extend({
-  name: 'CategoryDropdown',
-  components: { IconFolder },
+  name: 'ListDropdown',
+  components: { Icon },
   props: {
     value: { type: String, default: '' },
     disabled: { type: Boolean, default: false }
@@ -57,11 +66,14 @@ export default Vue.extend({
         right: `${window.innerWidth - rect.right}px`,
         transform: 'translateY(-100%)'
       }
+    },
+    lists(): string[] {
+      return this.$store.getters['lists/all']
     }
   },
   methods: {
-    selectCategory(category: string) {
-      this.$emit('input', category)
+    selectList(list: string) {
+      this.$emit('input', list)
       this.isOpen = false
     }
   }

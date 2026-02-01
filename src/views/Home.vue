@@ -2,7 +2,7 @@
   <div class="h-full flex flex-col">
     <div class="flex-1 overflow-y-auto [scrollbar-gutter:stable]">
       <div class="w-full max-w-6xl mx-auto px-4 md:px-6 lg:px-8 pt-4 md:pt-6 lg:pt-8 pb-2">
-        <h1 class="text-3xl md:text-4xl font-bold text-text-main dark:text-dark-text-main mb-6">General</h1>
+        <h1 class="text-3xl md:text-4xl font-bold text-text-main dark:text-dark-text-main mb-6">{{ currentList || 'General' }}</h1>
         
         <div 
           v-if="initialLoading"
@@ -53,7 +53,7 @@
               class="flex-shrink-0 w-6 h-6 rounded border-2 border-border dark:border-dark-border hover:border-green-500 dark:hover:border-green-400 hover:bg-green-50 dark:hover:bg-green-900/20 transition-all shadow-sm hover:shadow flex items-center justify-center group"
               title="Mark as complete"
             >
-              <IconCheck class="h-4 w-4 text-transparent group-hover:text-green-500 dark:group-hover:text-green-400 transition-colors" />
+              <Icon icon="heroicons-outline:check" class="h-4 w-4 text-transparent group-hover:text-green-500 dark:group-hover:text-green-400 transition-colors" />
             </button>
 
             <div class="flex-1 min-w-0">
@@ -63,14 +63,10 @@
               <p v-if="todo.description" class="text-sm text-text-secondary dark:text-dark-text-secondary break-words">
                 {{ todo.description }}
               </p>
-              <div v-if="todo.category || todo.dueDate" class="flex gap-3 text-xs text-text-secondary dark:text-dark-text-secondary">
-                <span v-if="todo.category" class="flex items-center gap-1">
-                  <IconFolder class="h-3 w-3" />
+              <div v-if="todo.category && !currentList" class="flex gap-3 text-xs text-text-secondary dark:text-dark-text-secondary">
+                <span class="flex items-center gap-1">
+                  <Icon icon="heroicons-outline:folder" class="h-3 w-3" />
                   {{ todo.category }}
-                </span>
-                <span v-if="todo.dueDate" class="flex items-center gap-1">
-                  <IconCalendar class="h-3 w-3" />
-                  {{ formatDate(todo.dueDate) }}
                 </span>
               </div>
             </div>
@@ -81,14 +77,14 @@
                 class="p-2 text-text-secondary dark:text-dark-text-secondary hover:text-primary dark:hover:text-dark-primary transition-colors rounded-lg hover:bg-background dark:hover:bg-dark-background"
                 title="Edit todo"
               >
-                <IconEdit class="h-5 w-5" />
+                <Icon icon="heroicons-outline:pencil" class="h-5 w-5" />
               </button>
               <button
                 @click="confirmDelete(todo)"
                 class="p-2 text-text-secondary dark:text-dark-text-secondary hover:text-red-500 dark:hover:text-red-400 transition-colors rounded-lg hover:bg-background dark:hover:bg-dark-background"
                 title="Delete todo"
               >
-                <IconTrash class="h-5 w-5" />
+                <Icon icon="heroicons-outline:trash" class="h-5 w-5" />
               </button>
             </div>
           </div>
@@ -99,7 +95,8 @@
               @click="showCompleted = !showCompleted"
               class="flex items-center gap-2 px-3 py-1.5 rounded-md border border-border dark:border-dark-border bg-surface dark:bg-dark-surface text-text-secondary dark:text-dark-text-secondary hover:text-text-main dark:hover:text-dark-text-main hover:border-primary dark:hover:border-dark-primary transition-colors mb-4 group"
             >
-              <IconArrowDown 
+              <Icon 
+                icon="heroicons-outline:chevron-down" 
                 class="h-4 w-4 transition-transform duration-200"
                 :class="{ 'rotate-180': !showCompleted }"
               />
@@ -119,7 +116,7 @@
                   class="flex-shrink-0 w-6 h-6 rounded border-2 border-green-500 dark:border-green-400 bg-green-500 dark:bg-green-400 hover:border-border dark:hover:border-dark-border hover:bg-transparent transition-all shadow-sm flex items-center justify-center group"
                   title="Mark as incomplete"
                 >
-                  <IconCheck class="h-4 w-4 text-white group-hover:text-transparent transition-colors" />
+                  <Icon icon="heroicons-outline:check" class="h-4 w-4 text-white group-hover:text-transparent transition-colors" />
                 </button>
 
                 <div class="flex-1 min-w-0">
@@ -129,14 +126,10 @@
                   <p v-if="todo.description" class="text-sm text-text-secondary dark:text-dark-text-secondary line-through break-words">
                     {{ todo.description }}
                   </p>
-                  <div v-if="todo.category || todo.dueDate" class="flex gap-3 text-xs text-text-secondary dark:text-dark-text-secondary">
-                    <span v-if="todo.category" class="flex items-center gap-1">
-                      <IconFolder class="h-3 w-3" />
+                  <div v-if="todo.category && !currentList" class="flex gap-3 text-xs text-text-secondary dark:text-dark-text-secondary">
+                    <span class="flex items-center gap-1">
+                      <Icon icon="heroicons-outline:folder" class="h-3 w-3" />
                       {{ todo.category }}
-                    </span>
-                    <span v-if="todo.dueDate" class="flex items-center gap-1">
-                      <IconCalendar class="h-3 w-3" />
-                      {{ formatDate(todo.dueDate) }}
                     </span>
                   </div>
                 </div>
@@ -147,7 +140,7 @@
                     class="p-2 text-text-secondary dark:text-dark-text-secondary hover:text-red-500 dark:hover:text-red-400 transition-colors rounded-lg hover:bg-background dark:hover:bg-dark-background"
                     title="Delete todo"
                   >
-                    <IconTrash class="h-5 w-5" />
+                    <Icon icon="heroicons-outline:trash" class="h-5 w-5" />
                   </button>
                 </div>
               </div>
@@ -197,15 +190,10 @@
                 100/100
               </span>
               
-              <!-- Category Dropdown -->
-              <CategoryDropdown
+              <!-- List Dropdown -->
+              <ListDropdown
+                v-if="!currentList"
                 v-model="newTodoCategory"
-                :disabled="isAddingTodo"
-              />
-
-              <!-- Due Date Picker -->
-              <DatePicker
-                v-model="newTodoDueDate"
                 :disabled="isAddingTodo"
               />
               
@@ -246,31 +234,19 @@
 
 <script lang="ts">
 import Vue from 'vue'
+import { Icon } from '@iconify/vue2'
 import { todosApi, type Todo } from '@/services/api'
 import EditModal from '@/components/EditModal.vue'
 import ConfirmModal from '@/components/ConfirmModal.vue'
-import CategoryDropdown from '@/components/CategoryDropdown.vue'
-import DatePicker from '@/components/DatePicker.vue'
-import IconCheck from '@/components/icons/IconCheck.vue'
-import IconArrowDown from '@/components/icons/IconArrowDown.vue'
-import IconEdit from '@/components/icons/IconEdit.vue'
-import IconTrash from '@/components/icons/IconTrash.vue'
-import IconFolder from '@/components/icons/IconFolder.vue'
-import IconCalendar from '@/components/icons/IconCalendar.vue'
+import ListDropdown from '@/components/ListDropdown.vue'
 
 export default Vue.extend({
   name: 'Home',
   components: {
+    Icon,
     EditModal,
     ConfirmModal,
-    CategoryDropdown,
-    DatePicker,
-    IconCheck,
-    IconArrowDown,
-    IconEdit,
-    IconTrash,
-    IconFolder,
-    IconCalendar
+    ListDropdown
   },
   data() {
     return {
@@ -279,7 +255,6 @@ export default Vue.extend({
       newTodoTitle: '',
       newTodoDescription: '',
       newTodoCategory: '',
-      newTodoDueDate: '',
       initialLoading: false,
       isAddingTodo: false,
       error: null as string | null,
@@ -294,26 +269,45 @@ export default Vue.extend({
     }
   },
   computed: {
+    currentList(): string | null {
+      return this.$route.params.list ? decodeURIComponent(this.$route.params.list) : null
+    },
+    filteredTodos(): Todo[] {
+      const list = this.currentList
+      if (list) {
+        return this.allTodos.filter(t => t.category === list)
+      }
+      // For General (home route), show todos with no category or empty category
+      return this.allTodos.filter(t => !t.category || t.category === '')
+    },
     todos(): Todo[] {
-      return this.allTodos.filter(t => !t.completed)
+      return this.filteredTodos.filter(t => !t.completed)
     },
     completedTodos(): Todo[] {
-      return this.allTodos.filter(t => t.completed)
+      return this.filteredTodos.filter(t => t.completed)
     }
   },
   async mounted() {
-    try {
-      this.initialLoading = true
-      this.error = null
-      this.allTodos = await todosApi.getTodos()
-    } catch (err) {
-      this.error = 'Failed to load todos'
-      console.error('Error fetching todos:', err)
-    } finally {
-      this.initialLoading = false
+    await this.fetchTodos()
+  },
+  watch: {
+    '$route'() {
+      // When route changes, we already have all todos, just need to recompute filtered list
     }
   },
   methods: {
+    async fetchTodos() {
+      try {
+        this.initialLoading = true
+        this.error = null
+        this.allTodos = await todosApi.getTodos()
+      } catch (err) {
+        this.error = 'Failed to load todos'
+        console.error('Error fetching todos:', err)
+      } finally {
+        this.initialLoading = false
+      }
+    },
     async addTodo() {
       if (!this.newTodoTitle.trim()) return
 
@@ -321,28 +315,28 @@ export default Vue.extend({
         this.isAddingTodo = true
         this.error = null
         
+        // Use the current list from the route if available, otherwise use selected category
+        const category = this.currentList || this.newTodoCategory || undefined
+        
         const newTodo = await todosApi.createTodo({
           title: this.newTodoTitle.trim(),
           description: this.newTodoDescription.trim(),
-          category: this.newTodoCategory || undefined,
-          dueDate: this.newTodoDueDate || undefined
+          category: category
         })
         this.allTodos.push(newTodo)
         
         this.newTodoTitle = ''
         this.newTodoDescription = ''
-        this.newTodoCategory = ''
-        this.newTodoDueDate = ''
+        // Only reset category if we're on the General page
+        if (!this.currentList) {
+          this.newTodoCategory = ''
+        }
       } catch (err) {
         this.error = 'Failed to create todo'
         console.error('Error creating todo:', err)
       } finally {
         this.isAddingTodo = false
       }
-    },
-    formatDate(dateString: string): string {
-      const date = new Date(dateString)
-      return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
     },
     openEditModal(todo: Todo) {
       this.todoToEdit = todo

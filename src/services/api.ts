@@ -14,7 +14,6 @@ export interface Todo {
   completed: boolean
   deleted: boolean
   category?: string
-  dueDate?: string
   createdAt: string
   updatedAt: string
 }
@@ -23,7 +22,6 @@ export interface CreateTodo {
   title: string
   description?: string
   category?: string
-  dueDate?: string
 }
 
 export interface UpdateTodo {
@@ -31,12 +29,22 @@ export interface UpdateTodo {
   description?: string
   completed?: boolean
   category?: string
-  dueDate?: string
 }
 
 interface ApiResponse<T> {
   success: boolean
   data: T
+}
+
+export interface List {
+  _id: string
+  name: string
+  createdAt: string
+  updatedAt: string
+}
+
+export interface CreateList {
+  name: string
 }
 
 export const todosApi = {
@@ -62,5 +70,23 @@ export const todosApi = {
   deleteTodo: async (id: string): Promise<void> => {
     await apiClient.delete(`/todos/${id}`)
   },
+}
 
+export const listsApi = {
+  // Get all lists
+  getLists: async (): Promise<List[]> => {
+    const response = await apiClient.get<ApiResponse<List[]>>('/lists')
+    return response.data.data
+  },
+
+  // Create a list
+  createList: async (list: CreateList): Promise<List> => {
+    const response = await apiClient.post<ApiResponse<List>>('/lists', list)
+    return response.data.data
+  },
+
+  // Delete a list
+  deleteList: async (name: string): Promise<void> => {
+    await apiClient.delete(`/lists/${encodeURIComponent(name)}`)
+  },
 }
