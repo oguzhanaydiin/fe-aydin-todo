@@ -4,90 +4,45 @@
       <div class="w-full max-w-6xl mx-auto px-4 md:px-6 lg:px-8 pt-4 md:pt-6 lg:pt-8 pb-2">
         <h1 class="text-3xl md:text-4xl font-bold text-text-main dark:text-dark-text-main mb-6">{{ currentListName || 'General' }}</h1>
         
-        <div 
+        <!-- loading -->
+        <EmptyState 
           v-if="initialLoading"
-          class="text-center py-12"
-        >
-          <p class="text-text-secondary dark:text-dark-text-secondary text-lg">
-            Loading todos...
-          </p>
-        </div>
+          type="loading"
+          message="Loading todos..."
+        />
 
-        <div 
+        <!-- error -->
+        <EmptyState 
           v-else-if="error"
-          class="text-center py-12"
-        >
-          <p class="text-red-500 text-lg">
-            {{ error }}
-          </p>
-        </div>
+          type="error"
+          :message="error"
+        />
 
-        <div 
+        <!-- empty -->
+        <EmptyState 
           v-else-if="allTodos.length === 0"
-          class="text-center py-12"
-        >
-          <p class="text-text-secondary dark:text-dark-text-secondary text-lg">
-            No todos yet. Add one below to get started!
-          </p>
-        </div>
+          type="empty"
+          message="No todos yet. Add one below to get started!"
+        />
 
         <template v-else>
-          <!-- No Todos Message -->
-          <div 
+          <EmptyState 
             v-if="todos.length === 0 && completedTodos.length > 0"
-            class="text-center py-12"
-          >
-            <p class="text-text-secondary dark:text-dark-text-secondary text-lg">
-              No todos yet. Add one below to get started!
-            </p>
-          </div>
+            type="empty"
+            message="No todos yet. Add one below to get started!"
+          />
 
-          <!-- Todos -->
-          <div 
-            v-for="todo in todos" 
+          <TodoItem
+            v-for="todo in todos"
             :key="todo._id"
-            class="bg-surface dark:bg-dark-surface rounded-lg shadow-sm px-6 py-3 mb-4 border border-border dark:border-dark-border flex items-center gap-4"
-          >
-            <button
-              @click="toggleComplete(todo)"
-              class="flex-shrink-0 w-6 h-6 rounded border-2 border-border dark:border-dark-border hover:border-green-500 dark:hover:border-green-400 hover:bg-green-50 dark:hover:bg-green-900/20 transition-all shadow-sm hover:shadow flex items-center justify-center group"
-              title="Mark as complete"
-            >
-              <Icon icon="heroicons-outline:check" class="h-4 w-4 text-transparent group-hover:text-green-500 dark:group-hover:text-green-400 transition-colors" />
-            </button>
+            :todo="todo"
+            :is-completed="false"
+            @toggle-complete="toggleComplete"
+            @edit="openEditModal"
+            @delete="confirmDelete"
+          />
 
-            <div class="flex-1 min-w-0">
-              <h3 class="text-base md:text-lg text-text-main dark:text-dark-text-main font-semibold mb-1 break-words">
-                {{ todo.title }}
-              </h3>
-              <p v-if="todo.description" class="text-sm text-text-secondary dark:text-dark-text-secondary break-words">
-                {{ todo.description }}
-              </p>
-            </div>
-            
-            <div class="flex-shrink-0 flex gap-2 items-center">
-              <span v-if="todo.listName" class="flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-background dark:bg-dark-background text-sm text-text-secondary dark:text-dark-text-secondary font-medium">
-                <Icon icon="heroicons-outline:folder" class="h-4 w-4" />
-                {{ todo.listName }}
-              </span>
-              <button
-                @click="openEditModal(todo)"
-                class="p-2 text-text-secondary dark:text-dark-text-secondary hover:text-primary dark:hover:text-dark-primary transition-colors rounded-lg hover:bg-background dark:hover:bg-dark-background"
-                title="Edit todo"
-              >
-                <Icon icon="heroicons-outline:pencil" class="h-5 w-5" />
-              </button>
-              <button
-                @click="confirmDelete(todo)"
-                class="p-2 text-text-secondary dark:text-dark-text-secondary hover:text-red-500 dark:hover:text-red-400 transition-colors rounded-lg hover:bg-background dark:hover:bg-dark-background"
-                title="Delete todo"
-              >
-                <Icon icon="heroicons-outline:trash" class="h-5 w-5" />
-              </button>
-            </div>
-          </div>
-
-          <!-- Completed Todos -->
+          <!-- completed todos -->
           <div v-if="completedTodos.length > 0" class="mt-6">
             <button
               @click="showCompleted = !showCompleted"
@@ -104,107 +59,28 @@
             </button>
 
             <div v-show="showCompleted">
-              <div 
-                v-for="todo in completedTodos" 
+              <TodoItem
+                v-for="todo in completedTodos"
                 :key="todo._id"
-                class="bg-surface dark:bg-dark-surface rounded-lg shadow-sm px-6 py-3 mb-4 border border-border dark:border-dark-border flex items-center gap-4 opacity-50 hover:opacity-70 transition-opacity"
-              >
-                <button
-                  @click="toggleComplete(todo)"
-                  class="flex-shrink-0 w-6 h-6 rounded border-2 border-green-500 dark:border-green-400 bg-green-500 dark:bg-green-400 hover:border-border dark:hover:border-dark-border hover:bg-transparent transition-all shadow-sm flex items-center justify-center group"
-                  title="Mark as incomplete"
-                >
-                  <Icon icon="heroicons-outline:check" class="h-4 w-4 text-white group-hover:text-transparent transition-colors" />
-                </button>
-
-                <div class="flex-1 min-w-0">
-                  <h3 class="text-base md:text-lg text-text-main dark:text-dark-text-main font-semibold mb-1 line-through break-words">
-                    {{ todo.title }}
-                  </h3>
-                  <p v-if="todo.description" class="text-sm text-text-secondary dark:text-dark-text-secondary line-through break-words">
-                    {{ todo.description }}
-                  </p>
-                </div>
-                
-                <div class="flex-shrink-0 flex gap-2 items-center">
-                  <span v-if="todo.listName" class="flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-background dark:bg-dark-background text-sm text-text-secondary dark:text-dark-text-secondary font-medium line-through">
-                    <Icon icon="heroicons-outline:folder" class="h-4 w-4" />
-                    {{ todo.listName }}
-                  </span>
-                  <button
-                    @click="confirmDelete(todo)"
-                    class="p-2 text-text-secondary dark:text-dark-text-secondary hover:text-red-500 dark:hover:text-red-400 transition-colors rounded-lg hover:bg-background dark:hover:bg-dark-background"
-                    title="Delete todo"
-                  >
-                    <Icon icon="heroicons-outline:trash" class="h-5 w-5" />
-                  </button>
-                </div>
-              </div>
+                :todo="todo"
+                :is-completed="true"
+                :show-edit-button="false"
+                @toggle-complete="toggleComplete"
+                @delete="confirmDelete"
+              />
             </div>
           </div>
         </template>
-        
       </div>
     </div>
 
-    <!-- Input -->
-    <div class="bg-background dark:bg-dark-background overflow-y-auto [scrollbar-gutter:stable]">
-      <div class="w-full max-w-6xl mx-auto px-4 md:px-6 lg:px-8 pb-4 md:pb-6 lg:pb-8">
-        <div class="bg-surface dark:bg-dark-surface rounded-lg shadow-sm p-6 border border-border dark:border-dark-border relative">
-          <div class="flex flex-col gap-2">
-            <div class="flex items-center gap-2">
-              <input
-                v-model="newTodoTitle"
-                @keyup.enter="newTodoDescription ? addTodo() : null"
-                type="text"
-                placeholder="Title..."
-                maxlength="100"
-                :disabled="isAddingTodo"
-                class="flex-1 bg-transparent text-base md:text-lg text-text-main dark:text-dark-text-main placeholder-text-secondary dark:placeholder-dark-text-secondary focus:outline-none disabled:opacity-50 font-semibold"
-              />
-              <span 
-                v-if="newTodoTitle.length === 100"
-                class="text-xs text-red-500 dark:text-red-400 font-medium flex-shrink-0"
-              >
-                100/100
-              </span>
-            </div>
-            <div class="flex gap-2 items-center">
-              <input
-                v-model="newTodoDescription"
-                @keyup.enter="addTodo"
-                type="text"
-                placeholder="Description (optional)..."
-                maxlength="100"
-                :disabled="isAddingTodo"
-                class="flex-1 bg-transparent text-xs md:text-sm text-text-main dark:text-dark-text-main placeholder-text-secondary dark:placeholder-dark-text-secondary focus:outline-none disabled:opacity-50"
-              />
-              <span 
-                v-if="newTodoDescription.length === 100"
-                class="text-xs text-red-500 dark:text-red-400 font-medium flex-shrink-0"
-              >
-                100/100
-              </span>
-              
-              <!-- List Dropdown -->
-              <ListDropdown
-                v-model="selectedListName"
-                :disabled="isAddingTodo"
-              />
-              
-              <button
-                @click="addTodo"
-                :disabled="!newTodoTitle.trim() || isAddingTodo"
-                class="px-4 py-1.5 bg-primary dark:bg-dark-primary text-white rounded-md text-sm font-medium transition-opacity disabled:opacity-40 hover:enabled:opacity-90"
-              >
-                {{ isAddingTodo ? 'Adding...' : 'Add' }}
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
+    <!-- Todo Input -->
+    <TodoInput
+      :initial-list-name="currentListName || 'General'"
+      @add-todo="handleAddTodo"
+    />
 
+    <!-- Edit Modal -->
     <EditModal
       :is-open="isEditModalOpen"
       :title="editTitle"
@@ -214,6 +90,7 @@
       @cancel="cancelEdit"
     />
 
+    <!-- Delete Confirmation Modal -->
     <ConfirmModal
       :is-open="isDeleteModalOpen"
       title="Delete Todo"
@@ -231,25 +108,25 @@
 import Vue from 'vue'
 import { Icon } from '@iconify/vue2'
 import { type Todo } from '@/services/api'
-import EditModal from '@/components/EditModal.vue'
-import ConfirmModal from '@/components/ConfirmModal.vue'
-import ListDropdown from '@/components/ListDropdown.vue'
+import TodoItem from '@/components/todos/TodoItem.vue'
+import TodoInput from '@/components/todos/TodoInput.vue'
+import EmptyState from '@/components/ui/EmptyState.vue'
+import EditModal from '@/components/modals/EditModal.vue'
+import ConfirmModal from '@/components/modals/ConfirmModal.vue'
 
 export default Vue.extend({
   name: 'Home',
   components: {
     Icon,
+    TodoItem,
+    TodoInput,
+    EmptyState,
     EditModal,
-    ConfirmModal,
-    ListDropdown
+    ConfirmModal
   },
   data() {
     return {
       showCompleted: true,
-      newTodoTitle: '',
-      newTodoDescription: '',
-      selectedListName: 'General',
-      isAddingTodo: false,
       isEditModalOpen: false,
       todoToEdit: null as Todo | null,
       editTitle: '',
@@ -289,16 +166,10 @@ export default Vue.extend({
     }
   },
   async mounted() {
-    // Set the dropdown to match the current list on initial load
-    this.selectedListName = this.currentListName || 'General'
-    // Update page title
     this.updatePageTitle()
   },
   watch: {
     '$route'() {
-      // When route changes, update the dropdown to match current list
-      this.selectedListName = this.currentListName || 'General'
-      // Update page title
       this.updatePageTitle()
     }
   },
@@ -307,54 +178,30 @@ export default Vue.extend({
       const listName = this.currentListName
       document.title = listName ? `${listName} - AydinTodo` : 'AydinTodo'
     },
-    async addTodo() {
-      if (!this.newTodoTitle.trim()) return
+    navigateToList(listName: string) {
+      if (listName === 'General') {
+        this.$router.push('/')
+      } else {
+        this.$router.push(`/${listName.replace(/ /g, '_')}`)
+      }
+    },
 
+    async handleAddTodo(data: { title: string; description: string; listName: string }) {
       try {
-        this.isAddingTodo = true
-        
-        // Use the selectedListName from dropdown
-        const listName = this.selectedListName || 'General'
-        
         await this.$store.dispatch('todos/addTodo', {
-          title: this.newTodoTitle.trim(),
-          description: this.newTodoDescription.trim(),
-          listName: listName
+          title: data.title,
+          description: data.description,
+          listName: data.listName
         })
-        
-        this.newTodoTitle = ''
-        this.newTodoDescription = ''
         
         // Navigate to the list if it's different from the current one
         const currentListOrGeneral = this.currentListName || 'General'
-        if (listName !== currentListOrGeneral) {
-          // Navigate to the new list
-          if (listName === 'General') {
-            this.$router.push('/')
-          } else {
-            this.$router.push(`/${listName.replace(/ /g, '_')}`)
-          }
-        } else {
-          // Reset selectedListName to current list if staying on the same page
-          this.selectedListName = this.currentListName || 'General'
+        if (data.listName !== currentListOrGeneral) {
+          this.navigateToList(data.listName)
         }
       } catch (err) {
         console.error('Error creating todo:', err)
-      } finally {
-        this.isAddingTodo = false
       }
-    },
-    openEditModal(todo: Todo) {
-      this.todoToEdit = todo
-      this.editTitle = todo.title
-      this.editDescription = todo.description
-      this.isEditModalOpen = true
-    },
-    cancelEdit() {
-      this.isEditModalOpen = false
-      this.todoToEdit = null
-      this.editTitle = ''
-      this.editDescription = ''
     },
     async toggleComplete(todo: Todo) {
       try {
@@ -366,57 +213,61 @@ export default Vue.extend({
         console.error('Error updating todo:', err)
       }
     },
+
+    openEditModal(todo: Todo) {
+      this.todoToEdit = todo
+      this.editTitle = todo.title
+      this.editDescription = todo.description
+      this.isEditModalOpen = true
+    },
     async handleEdit(data: { title: string; description: string }) {
       if (!this.todoToEdit) return
-
-      const todoId = this.todoToEdit._id
 
       try {
         this.isEditing = true
         
         await this.$store.dispatch('todos/updateTodo', {
-          id: todoId,
+          id: this.todoToEdit._id,
           updates: {
             title: data.title,
             description: data.description
           }
         })
         
-        this.isEditModalOpen = false
-        this.todoToEdit = null
-        this.editTitle = ''
-        this.editDescription = ''
+        this.cancelEdit()
       } catch (err) {
         console.error('Error updating todo:', err)
       } finally {
         this.isEditing = false
       }
     },
+    cancelEdit() {
+      this.isEditModalOpen = false
+      this.todoToEdit = null
+      this.editTitle = ''
+      this.editDescription = ''
+    },
+
     confirmDelete(todo: Todo) {
       this.todoToDelete = todo
       this.isDeleteModalOpen = true
     },
-    cancelDelete() {
-      this.isDeleteModalOpen = false
-      this.todoToDelete = null
-    },
     async handleDelete() {
       if (!this.todoToDelete) return
 
-      const todoId = this.todoToDelete._id
-
       try {
         this.isDeleting = true
-        
-        await this.$store.dispatch('todos/deleteTodo', todoId)
-        
-        this.isDeleteModalOpen = false
-        this.todoToDelete = null
+        await this.$store.dispatch('todos/deleteTodo', this.todoToDelete._id)
+        this.cancelDelete()
       } catch (err) {
         console.error('Error deleting todo:', err)
       } finally {
         this.isDeleting = false
       }
+    },
+    cancelDelete() {
+      this.isDeleteModalOpen = false
+      this.todoToDelete = null
     }
   }
 })

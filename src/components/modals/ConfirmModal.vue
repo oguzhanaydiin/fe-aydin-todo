@@ -41,7 +41,7 @@
 
 <script lang="ts">
 import Vue from 'vue'
-import BaseModal from './BaseModal.vue'
+import BaseModal from '@/components/modals/BaseModal.vue'
 
 type ModalVariant = 'danger' | 'primary'
 

@@ -1,11 +1,11 @@
-import Vue from 'vue';
-import Vuex, { StoreOptions } from 'vuex';
-import { RootState } from './types';
-import themeModule from './modules/theme';
-import listsModule from './modules/lists';
-import todosModule from './modules/todos';
+import Vue from 'vue'
+import Vuex, { StoreOptions } from 'vuex'
+import { RootState } from './types'
+import themeModule from './modules/theme'
+import listsModule from './modules/lists'
+import todosModule from './modules/todos'
 
-Vue.use(Vuex);
+Vue.use(Vuex)
 
 const store: StoreOptions<RootState> = {
   modules: {
@@ -15,11 +15,11 @@ const store: StoreOptions<RootState> = {
   },
   actions: {
     init({ dispatch }) {
-      dispatch('theme/init');
-      dispatch('lists/fetchLists');
-      dispatch('todos/fetchTodos');
+      dispatch('theme/init')
+      dispatch('lists/fetchLists')
+      dispatch('todos/fetchTodos')
     }
   }
-};
+}
 
-export default new Vuex.Store<RootState>(store);
+export default new Vuex.Store<RootState>(store)
