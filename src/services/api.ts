@@ -13,6 +13,8 @@ export interface Todo {
   description: string
   completed: boolean
   deleted: boolean
+  category?: string
+  dueDate?: string
   createdAt: string
   updatedAt: string
 }
@@ -20,12 +22,16 @@ export interface Todo {
 export interface CreateTodo {
   title: string
   description?: string
+  category?: string
+  dueDate?: string
 }
 
 export interface UpdateTodo {
   title?: string
   description?: string
   completed?: boolean
+  category?: string
+  dueDate?: string
 }
 
 interface ApiResponse<T> {

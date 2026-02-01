@@ -46,7 +46,7 @@
           <div 
             v-for="todo in todos" 
             :key="todo._id"
-            class="bg-surface dark:bg-dark-surface rounded-lg shadow-sm p-6 mb-4 border border-border dark:border-dark-border flex items-center gap-4"
+            class="bg-surface dark:bg-dark-surface rounded-lg shadow-sm px-6 py-3 mb-4 border border-border dark:border-dark-border flex items-center gap-4"
           >
             <button
               @click="toggleComplete(todo)"
@@ -63,6 +63,16 @@
               <p v-if="todo.description" class="text-sm text-text-secondary dark:text-dark-text-secondary break-words">
                 {{ todo.description }}
               </p>
+              <div v-if="todo.category || todo.dueDate" class="flex gap-3 text-xs text-text-secondary dark:text-dark-text-secondary">
+                <span v-if="todo.category" class="flex items-center gap-1">
+                  <IconFolder class="h-3 w-3" />
+                  {{ todo.category }}
+                </span>
+                <span v-if="todo.dueDate" class="flex items-center gap-1">
+                  <IconCalendar class="h-3 w-3" />
+                  {{ formatDate(todo.dueDate) }}
+                </span>
+              </div>
             </div>
             
             <div class="flex-shrink-0 flex gap-2">
@@ -102,7 +112,7 @@
               <div 
                 v-for="todo in completedTodos" 
                 :key="todo._id"
-                class="bg-surface dark:bg-dark-surface rounded-lg shadow-sm p-6 mb-4 border border-border dark:border-dark-border flex items-center gap-4 opacity-50 hover:opacity-70 transition-opacity"
+                class="bg-surface dark:bg-dark-surface rounded-lg shadow-sm px-6 py-3 mb-4 border border-border dark:border-dark-border flex items-center gap-4 opacity-50 hover:opacity-70 transition-opacity"
               >
                 <button
                   @click="toggleComplete(todo)"
@@ -119,6 +129,16 @@
                   <p v-if="todo.description" class="text-sm text-text-secondary dark:text-dark-text-secondary line-through break-words">
                     {{ todo.description }}
                   </p>
+                  <div v-if="todo.category || todo.dueDate" class="flex gap-3 text-xs text-text-secondary dark:text-dark-text-secondary">
+                    <span v-if="todo.category" class="flex items-center gap-1">
+                      <IconFolder class="h-3 w-3" />
+                      {{ todo.category }}
+                    </span>
+                    <span v-if="todo.dueDate" class="flex items-center gap-1">
+                      <IconCalendar class="h-3 w-3" />
+                      {{ formatDate(todo.dueDate) }}
+                    </span>
+                  </div>
                 </div>
                 
                 <div class="flex-shrink-0 flex gap-2">
@@ -141,8 +161,8 @@
     <!-- Input -->
     <div class="bg-background dark:bg-dark-background overflow-y-auto [scrollbar-gutter:stable]">
       <div class="w-full max-w-6xl mx-auto px-4 md:px-6 lg:px-8 pb-4 md:pb-6 lg:pb-8">
-        <div class="bg-surface dark:bg-dark-surface rounded-lg shadow-sm p-6 border border-border dark:border-dark-border">
-          <div class="flex flex-col gap-2">
+        <div class="bg-surface dark:bg-dark-surface rounded-lg shadow-sm p-6 border border-border dark:border-dark-border relative">
+          <div class="flex flex-col gap-2 overflow-visible">
             <div class="flex items-center gap-2">
               <input
                 v-model="newTodoTitle"
@@ -176,10 +196,83 @@
               >
                 100/100
               </span>
+              
+              <!-- Category Dropdown -->
+              <div class="relative">
+                <button
+                  ref="categoryButton"
+                  @click="showCategoryDropdown = !showCategoryDropdown"
+                  :disabled="isAddingTodo"
+                  class="flex items-center gap-1.5 px-3 py-1.5 text-sm text-text-secondary dark:text-dark-text-secondary hover:text-primary dark:hover:text-dark-primary transition-colors rounded-md border border-border dark:border-dark-border hover:border-primary dark:hover:border-dark-primary disabled:opacity-50"
+                  title="Category"
+                >
+                  <IconFolder class="h-4 w-4" />
+                  <span>{{ newTodoCategory || 'General' }}</span>
+                </button>
+                <div
+                  v-if="showCategoryDropdown"
+                  v-click-outside="() => showCategoryDropdown = false"
+                  :style="categoryDropdownStyle"
+                  class="fixed bg-surface dark:bg-dark-surface border border-border dark:border-dark-border rounded-lg shadow-lg py-1 z-50 min-w-[150px]"
+                >
+                  <button
+                    @click="selectCategory('')"
+                    class="w-full px-4 py-2 text-left text-sm hover:bg-background dark:hover:bg-dark-background transition-colors"
+                    :class="newTodoCategory === '' ? 'text-primary dark:text-dark-primary font-medium' : 'text-text-main dark:text-dark-text-main'"
+                  >
+                    General
+                  </button>
+                </div>
+              </div>
+
+              <!-- Due Date Picker -->
+              <div class="relative">
+                <button
+                  ref="dateButton"
+                  @click="showDatePicker = !showDatePicker"
+                  :disabled="isAddingTodo"
+                  class="flex items-center gap-1.5 px-3 py-1.5 text-sm transition-colors rounded-md border disabled:opacity-50"
+                  :class="newTodoDueDate 
+                    ? 'text-primary dark:text-dark-primary border-primary dark:border-dark-primary' 
+                    : 'text-text-secondary dark:text-dark-text-secondary border-border dark:border-dark-border hover:text-primary dark:hover:text-dark-primary hover:border-primary dark:hover:border-dark-primary'"
+                  title="Due date"
+                >
+                  <IconCalendar class="h-4 w-4" />
+                  <span v-if="newTodoDueDate">{{ formatDate(newTodoDueDate) }}</span>
+                  <span v-else>Date</span>
+                </button>
+                <div
+                  v-if="showDatePicker"
+                  v-click-outside="closeDatePicker"
+                  :style="datePickerStyle"
+                  class="fixed bg-surface dark:bg-dark-surface border border-border dark:border-dark-border rounded-lg shadow-lg p-3 z-50"
+                >
+                  <input
+                    v-model="newTodoDueDate"
+                    type="date"
+                    class="bg-transparent text-sm text-text-main dark:text-dark-text-main border border-border dark:border-dark-border rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-primary dark:focus:ring-dark-primary"
+                  />
+                  <div class="flex gap-2 mt-2">
+                    <button
+                      @click="clearDate"
+                      class="flex-1 px-2 py-1 text-xs text-text-secondary dark:text-dark-text-secondary hover:text-text-main dark:hover:text-dark-text-main"
+                    >
+                      Clear
+                    </button>
+                    <button
+                      @click="showDatePicker = false"
+                      class="flex-1 px-2 py-1 text-xs bg-primary dark:bg-dark-primary text-white rounded"
+                    >
+                      Done
+                    </button>
+                  </div>
+                </div>
+              </div>
+              
               <button
                 @click="addTodo"
                 :disabled="!newTodoTitle.trim() || isAddingTodo"
-                class="px-5 py-2 bg-primary dark:bg-dark-primary text-white rounded-lg font-medium transition-opacity disabled:opacity-40 hover:enabled:opacity-90"
+                class="px-4 py-1.5 bg-primary dark:bg-dark-primary text-white rounded-md text-sm font-medium transition-opacity disabled:opacity-40 hover:enabled:opacity-90"
               >
                 {{ isAddingTodo ? 'Adding...' : 'Add' }}
               </button>
@@ -220,6 +313,29 @@ import IconCheck from '@/components/icons/IconCheck.vue'
 import IconArrowDown from '@/components/icons/IconArrowDown.vue'
 import IconEdit from '@/components/icons/IconEdit.vue'
 import IconTrash from '@/components/icons/IconTrash.vue'
+import IconFolder from '@/components/icons/IconFolder.vue'
+import IconCalendar from '@/components/icons/IconCalendar.vue'
+
+// Click outside directive
+interface HTMLElementWithClickOutside extends HTMLElement {
+  clickOutsideEvent?: (event: Event) => void
+}
+
+const vClickOutside = {
+  mounted(el: HTMLElementWithClickOutside, binding: { value: (event: Event) => void }) {
+    el.clickOutsideEvent = (event: Event) => {
+      if (!(el === event.target || el.contains(event.target as Node))) {
+        binding.value(event)
+      }
+    }
+    document.addEventListener('click', el.clickOutsideEvent)
+  },
+  unmounted(el: HTMLElementWithClickOutside) {
+    if (el.clickOutsideEvent) {
+      document.removeEventListener('click', el.clickOutsideEvent)
+    }
+  }
+}
 
 const allTodos = ref<Todo[]>([])
 const showCompleted = ref(true)
@@ -228,6 +344,32 @@ const todos = computed(() => allTodos.value.filter(t => !t.completed))
 const completedTodos = computed(() => allTodos.value.filter(t => t.completed))
 const newTodoTitle = ref('')
 const newTodoDescription = ref('')
+const newTodoCategory = ref('')
+const newTodoDueDate = ref('')
+const showCategoryDropdown = ref(false)
+const showDatePicker = ref(false)
+const categoryButton = ref<HTMLElement>()
+const dateButton = ref<HTMLElement>()
+
+const categoryDropdownStyle = computed(() => {
+  if (!categoryButton.value) return {}
+  const rect = categoryButton.value.getBoundingClientRect()
+  return {
+    top: `${rect.top - 8}px`,
+    right: `${window.innerWidth - rect.right}px`,
+    transform: 'translateY(-100%)'
+  }
+})
+
+const datePickerStyle = computed(() => {
+  if (!dateButton.value) return {}
+  const rect = dateButton.value.getBoundingClientRect()
+  return {
+    top: `${rect.top - 8}px`,
+    right: `${window.innerWidth - rect.right}px`,
+    transform: 'translateY(-100%)'
+  }
+})
 const initialLoading = ref(false)
 const isAddingTodo = ref(false)
 const error = ref<string | null>(null)
@@ -266,18 +408,42 @@ const addTodo = async () => {
     
     const newTodo = await todosApi.createTodo({
       title: newTodoTitle.value.trim(),
-      description: newTodoDescription.value.trim()
+      description: newTodoDescription.value.trim(),
+      category: newTodoCategory.value || undefined,
+      dueDate: newTodoDueDate.value || undefined
     })
     allTodos.value.push(newTodo)
     
     newTodoTitle.value = ''
     newTodoDescription.value = ''
+    newTodoCategory.value = ''
+    newTodoDueDate.value = ''
   } catch (err) {
     error.value = 'Failed to create todo'
     console.error('Error creating todo:', err)
   } finally {
     isAddingTodo.value = false
   }
+}
+
+const selectCategory = (category: string) => {
+  newTodoCategory.value = category
+  showCategoryDropdown.value = false
+}
+
+const closeDatePicker = () => {
+  newTodoDueDate.value = ''
+  showDatePicker.value = false
+}
+
+const clearDate = () => {
+  newTodoDueDate.value = ''
+  showDatePicker.value = false
+}
+
+const formatDate = (dateString: string) => {
+  const date = new Date(dateString)
+  return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
 }
 
 const openEditModal = (todo: Todo) => {
