@@ -84,53 +84,66 @@
   </BaseModal>
 </template>
 
-<script setup lang="ts">
-import { ref, watch } from 'vue'
-import BaseModal from './BaseModal.vue'
+<script lang="ts">
+import Vue from 'vue'
+import BaseModal from '@/components/modals/BaseModal.vue'
 
-const props = defineProps({
-  isOpen: {
-    type: Boolean,
-    required: true
-  },
-  title: {
-    type: String,
-    required: true
-  },
-  description: {
-    type: String,
-    required: true
-  },
-  loading: {
-    type: Boolean,
-    default: false
-  }
-})
-
-const emit = defineEmits(['save', 'cancel'])
-
-const localTitle = ref('')
-const localDescription = ref('')
-
-watch(() => props.isOpen, (newVal) => {
-  if (newVal) {
-    localTitle.value = props.title
-    localDescription.value = props.description
-  }
-})
-
-const onSave = () => {
-  if (!localTitle.value.trim() || props.loading) return
-  
-  emit('save', {
-    title: localTitle.value.trim(),
-    description: localDescription.value.trim()
-  })
+interface SaveData {
+  title: string
+  description: string
 }
 
-const onCancel = () => {
-  if (!props.loading) {
-    emit('cancel')
+export default Vue.extend({
+  name: 'EditModal',
+  components: {
+    BaseModal
+  },
+  props: {
+    isOpen: {
+      type: Boolean,
+      required: true
+    },
+    title: {
+      type: String,
+      required: true
+    },
+    description: {
+      type: String,
+      required: true
+    },
+    loading: {
+      type: Boolean,
+      default: false
+    }
+  },
+  data() {
+    return {
+      localTitle: '',
+      localDescription: ''
+    }
+  },
+  watch: {
+    isOpen(newVal: boolean) {
+      if (newVal) {
+        this.localTitle = this.title
+        this.localDescription = this.description
+      }
+    }
+  },
+  methods: {
+    onSave(): void {
+      if (!this.localTitle.trim() || this.loading) return
+      
+      this.$emit('save', {
+        title: this.localTitle.trim(),
+        description: this.localDescription.trim()
+      } as SaveData)
+    },
+    onCancel(): void {
+      if (!this.loading) {
+        this.$emit('cancel')
+      }
+    }
   }
-}
+})
 </script>

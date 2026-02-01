@@ -1,6 +1,6 @@
 # AydinTodo
 
-My Todo app built with Vue 2.7 and Tailwind CSS
+My Todo app built with Vue 2.6.14 and Tailwind CSS
 
 ## Setup
 

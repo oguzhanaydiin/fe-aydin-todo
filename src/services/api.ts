@@ -1,7 +1,7 @@
 import axios from 'axios'
 
 const apiClient = axios.create({
-  baseURL: import.meta.env.VITE_AYDIN_TODO_API_URL,
+  baseURL: process.env.AYDIN_TODO_API_URL || 'http://localhost:3000/api',
   headers: {
     'Content-Type': 'application/json',
   },
@@ -13,6 +13,7 @@ export interface Todo {
   description: string
   completed: boolean
   deleted: boolean
+  listName?: string
   createdAt: string
   updatedAt: string
 }
@@ -20,17 +21,30 @@ export interface Todo {
 export interface CreateTodo {
   title: string
   description?: string
+  listName?: string
 }
 
 export interface UpdateTodo {
   title?: string
   description?: string
   completed?: boolean
+  listName?: string
 }
 
 interface ApiResponse<T> {
   success: boolean
   data: T
+}
+
+export interface List {
+  _id: string
+  name: string
+  createdAt: string
+  updatedAt: string
+}
+
+export interface CreateList {
+  name: string
 }
 
 export const todosApi = {
@@ -56,5 +70,23 @@ export const todosApi = {
   deleteTodo: async (id: string): Promise<void> => {
     await apiClient.delete(`/todos/${id}`)
   },
+}
 
+export const listsApi = {
+  // Get all lists
+  getLists: async (): Promise<List[]> => {
+    const response = await apiClient.get<ApiResponse<List[]>>('/lists')
+    return response.data.data
+  },
+
+  // Create a list
+  createList: async (list: CreateList): Promise<List> => {
+    const response = await apiClient.post<ApiResponse<List>>('/lists', list)
+    return response.data.data
+  },
+
+  // Delete a list
+  deleteList: async (name: string): Promise<void> => {
+    await apiClient.delete(`/lists/${name.replace(/ /g, '_')}`)
+  },
 }
