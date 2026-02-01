@@ -48,6 +48,9 @@ module.exports = {
     new HtmlWebpackPlugin({
       template: './public/index.html'
     }),
+    new webpack.DefinePlugin({
+      'process.env.VUE_APP_AYDIN_TODO_API_URL': JSON.stringify(process.env.VUE_APP_AYDIN_TODO_API_URL)
+    })
   ],
   resolve: {
     alias: {
