@@ -1,7 +1,7 @@
 import axios from 'axios'
 
 const apiClient = axios.create({
-  baseURL: process.env.AYDIN_TODO_API_URL || 'http://localhost:3000/api',
+  baseURL: process.env.AYDIN_TODO_API_URL,
   headers: {
     'Content-Type': 'application/json',
   },

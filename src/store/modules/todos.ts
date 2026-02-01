@@ -10,11 +10,11 @@ export interface TodosState {
 
 const todosModule: Module<TodosState, RootState> = {
   namespaced: true,
-  state: {
+  state: (): TodosState => ({
     todos: [],
     loading: false,
     error: null
-  },
+  }),
   mutations: {
     SET_TODOS(state, todos: Todo[]) {
       state.todos = todos
