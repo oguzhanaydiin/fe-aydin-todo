@@ -41,7 +41,7 @@ export default Vue.extend({
         await this.$store.dispatch('lists/addList', listName)
         this.isNewListModalOpen = false
         // Navigate to the new list
-        this.$router.push(`/${encodeURIComponent(listName)}`)
+        this.$router.push(`/${listName.replace(/ /g, '_')}`)
       } catch (error: any) {
         this.createError = error.message || 'Failed to create list'
         // Don't close the modal so user can see the error
@@ -97,13 +97,13 @@ export default Vue.extend({
               General
             </router-link>
           </li>
-          <li v-for="list in lists" :key="list">
+          <li v-for="listName in lists" :key="listName">
             <router-link 
-              :to="`/${encodeURIComponent(list)}`"
+              :to="`/${listName.replace(/ /g, '_')}`"
               class="block px-4 py-2 rounded hover:bg-primary hover:text-white dark:hover:bg-dark-primary transition-colors"
               active-class="bg-primary text-white dark:bg-dark-primary"
             >
-              {{ list }}
+              {{ listName }}
             </router-link>
           </li>
         </ul>

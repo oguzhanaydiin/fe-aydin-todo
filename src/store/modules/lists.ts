@@ -23,7 +23,7 @@ const listsModule: Module<ListsState, RootState> = {
       state.lists.push(list);
     },
     REMOVE_LIST(state, name: string) {
-      state.lists = state.lists.filter(list => list.name !== name);
+      state.lists = state.lists.filter(listItem => listItem.name !== name);
     },
     SET_LOADING(state, loading: boolean) {
       state.loading = loading;
@@ -71,7 +71,7 @@ const listsModule: Module<ListsState, RootState> = {
     }
   },
   getters: {
-    all: (state) => state.lists.map(list => list.name),
+    all: (state) => state.lists.map(listItem => listItem.name),
     loading: (state) => state.loading,
     error: (state) => state.error
   }

@@ -41,14 +41,14 @@
               General
             </router-link>
           </li>
-          <li v-for="list in lists" :key="list">
+          <li v-for="listName in lists" :key="listName">
             <router-link
-            :to="`/${encodeURIComponent(list)}`"
+            :to="`/${listName.replace(/ /g, '_')}`"
             class="block px-4 py-2 rounded hover:bg-primary hover:text-white dark:hover:bg-dark-primary transition-colors"
             active-class="bg-primary text-white dark:bg-dark-primary"
             @click.native="close"
             >
-              {{ list }}
+              {{ listName }}
             </router-link>
           </li>
         </ul>

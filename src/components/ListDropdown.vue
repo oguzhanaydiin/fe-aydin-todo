@@ -19,20 +19,20 @@
       class="fixed bg-surface dark:bg-dark-surface border border-border dark:border-dark-border rounded-lg shadow-lg py-1 z-50 min-w-[150px] divide-y divide-border dark:divide-dark-border"
     >
       <button
-        @click.stop="selectList('')"
+        @click.stop="selectList('General')"
         class="w-full px-4 py-2 text-left text-sm hover:bg-background dark:hover:bg-dark-background transition-colors"
-        :class="value === '' ? 'text-primary dark:text-dark-primary font-medium' : 'text-text-main dark:text-dark-text-main'"
+        :class="value === 'General' ? 'text-primary dark:text-dark-primary font-medium' : 'text-text-main dark:text-dark-text-main'"
       >
         General
       </button>
       <button
-        v-for="list in lists"
-        :key="list"
-        @click.stop="selectList(list)"
+        v-for="listName in lists"
+        :key="listName"
+        @click.stop="selectList(listName)"
         class="w-full px-4 py-2 text-left text-sm hover:bg-background dark:hover:bg-dark-background transition-colors"
-        :class="value === list ? 'text-primary dark:text-dark-primary font-medium' : 'text-text-main dark:text-dark-text-main'"
+        :class="value === listName ? 'text-primary dark:text-dark-primary font-medium' : 'text-text-main dark:text-dark-text-main'"
       >
-        {{ list }}
+        {{ listName }}
       </button>
     </div>
   </div>
@@ -46,7 +46,7 @@ export default Vue.extend({
   name: 'ListDropdown',
   components: { Icon },
   props: {
-    value: { type: String, default: '' },
+    value: { type: String, default: 'General' },
     disabled: { type: Boolean, default: false }
   },
   data() {
@@ -72,8 +72,9 @@ export default Vue.extend({
     }
   },
   methods: {
-    selectList(list: string) {
-      this.$emit('input', list)
+    selectList(listName: string) {
+      // changes v-model value
+      this.$emit('input', listName)
       this.isOpen = false
     }
   }

@@ -106,7 +106,7 @@ export default Vue.extend({
       if (!trimmed) return
 
       const existingLists = this.$store.getters['lists/all'] as string[]
-      if (existingLists.some(list => list.toLowerCase() === trimmed.toLowerCase())) {
+      if (existingLists.some(listName => listName.toLowerCase() === trimmed.toLowerCase())) {
         this.error = 'A list with this name already exists'
         return
       }

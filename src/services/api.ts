@@ -13,7 +13,7 @@ export interface Todo {
   description: string
   completed: boolean
   deleted: boolean
-  category?: string
+  listName?: string
   createdAt: string
   updatedAt: string
 }
@@ -21,14 +21,14 @@ export interface Todo {
 export interface CreateTodo {
   title: string
   description?: string
-  category?: string
+  listName?: string
 }
 
 export interface UpdateTodo {
   title?: string
   description?: string
   completed?: boolean
-  category?: string
+  listName?: string
 }
 
 interface ApiResponse<T> {
@@ -87,6 +87,6 @@ export const listsApi = {
 
   // Delete a list
   deleteList: async (name: string): Promise<void> => {
-    await apiClient.delete(`/lists/${encodeURIComponent(name)}`)
+    await apiClient.delete(`/lists/${name.replace(/ /g, '_')}`)
   },
 }
