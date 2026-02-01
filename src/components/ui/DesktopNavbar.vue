@@ -54,7 +54,7 @@ export default Vue.extend({
           >
             <div class="flex items-center gap-2">
               <span>General</span>
-              <span class="text-xs font-medium px-1.5 py-0.5 rounded bg-border dark:bg-dark-border">
+              <span class="text-xs font-medium text-black dark:text-white px-1.5 py-0.5 rounded bg-border dark:bg-dark-border">
                 {{ allTodos.filter(t => !t.listName || t.listName === '' || t.listName === 'General').length }}
               </span>
             </div>
@@ -68,7 +68,7 @@ export default Vue.extend({
           >
             <div class="flex items-center gap-2">
               <span>{{ listName }}</span>
-              <span class="text-xs font-medium px-1.5 py-0.5 rounded bg-border dark:bg-dark-border">
+              <span class="text-xs font-medium text-black dark:text-white px-1.5 py-0.5 rounded bg-border dark:bg-dark-border">
                 {{ allTodos.filter(t => t.listName === listName).length }}
               </span>
             </div>

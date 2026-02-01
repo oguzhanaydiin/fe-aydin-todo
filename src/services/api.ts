@@ -1,9 +1,14 @@
 import axios from 'axios'
 
+const username = process.env.VUE_APP_AYDIN_TODO_API_USERNAME || ''
+const password = process.env.VUE_APP_AYDIN_TODO_API_PASSWORD || ''
+const credentials = btoa(`${username}:${password}`)
+
 const apiClient = axios.create({
   baseURL: process.env.VUE_APP_AYDIN_TODO_API_URL,
   headers: {
     'Content-Type': 'application/json',
+    'Authorization': `Basic ${credentials}`,
   },
 })
 
@@ -87,6 +92,6 @@ export const listsApi = {
 
   // Delete a list
   deleteList: async (name: string): Promise<void> => {
-    await apiClient.delete(`/lists/${name.replace(/ /g, '_')}`)
+    await apiClient.delete(`/lists/${encodeURIComponent(name)}`)
   },
 }

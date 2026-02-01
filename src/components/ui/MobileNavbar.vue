@@ -59,7 +59,7 @@
               >
                 <div class="flex items-center gap-2">
                   <span>General</span>
-                  <span class="text-xs font-medium px-1.5 py-0.5 rounded bg-border dark:bg-dark-border">
+                  <span class="text-xs font-medium text-black dark:text-white px-1.5 py-0.5 rounded bg-border dark:bg-dark-border">
                     {{ getTodoCount('General') }}
                   </span>
                 </div>
@@ -74,7 +74,7 @@
               >
                 <div class="flex items-center gap-2">
                   <span>{{ listName }}</span>
-                  <span class="text-xs font-medium px-1.5 py-0.5 rounded bg-border dark:bg-dark-border">
+                  <span class="text-xs font-medium text-black dark:text-white px-1.5 py-0.5 rounded bg-border dark:bg-dark-border">
                     {{ getTodoCount(listName) }}
                   </span>
                 </div>
