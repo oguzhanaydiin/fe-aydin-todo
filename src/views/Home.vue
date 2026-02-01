@@ -2,7 +2,7 @@
   <div class="h-full flex flex-col">
     <div class="flex-1 overflow-y-auto [scrollbar-gutter:stable]">
       <div class="w-full max-w-6xl mx-auto px-4 md:px-6 lg:px-8 pt-4 md:pt-6 lg:pt-8 pb-2">
-        <h1 class="text-3xl md:text-4xl font-bold text-text-main dark:text-dark-text-main mb-6">{{ currentList || 'General' }}</h1>
+        <h1 class="text-3xl md:text-4xl font-bold text-text-main dark:text-dark-text-main mb-6">{{ currentListName || 'General' }}</h1>
         
         <div 
           v-if="initialLoading"
@@ -63,15 +63,13 @@
               <p v-if="todo.description" class="text-sm text-text-secondary dark:text-dark-text-secondary break-words">
                 {{ todo.description }}
               </p>
-              <div v-if="todo.category && !currentList" class="flex gap-3 text-xs text-text-secondary dark:text-dark-text-secondary">
-                <span class="flex items-center gap-1">
-                  <Icon icon="heroicons-outline:folder" class="h-3 w-3" />
-                  {{ todo.category }}
-                </span>
-              </div>
             </div>
             
-            <div class="flex-shrink-0 flex gap-2">
+            <div class="flex-shrink-0 flex gap-2 items-center">
+              <span v-if="todo.listName" class="flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-background dark:bg-dark-background text-sm text-text-secondary dark:text-dark-text-secondary font-medium">
+                <Icon icon="heroicons-outline:folder" class="h-4 w-4" />
+                {{ todo.listName }}
+              </span>
               <button
                 @click="openEditModal(todo)"
                 class="p-2 text-text-secondary dark:text-dark-text-secondary hover:text-primary dark:hover:text-dark-primary transition-colors rounded-lg hover:bg-background dark:hover:bg-dark-background"
@@ -126,15 +124,13 @@
                   <p v-if="todo.description" class="text-sm text-text-secondary dark:text-dark-text-secondary line-through break-words">
                     {{ todo.description }}
                   </p>
-                  <div v-if="todo.category && !currentList" class="flex gap-3 text-xs text-text-secondary dark:text-dark-text-secondary">
-                    <span class="flex items-center gap-1">
-                      <Icon icon="heroicons-outline:folder" class="h-3 w-3" />
-                      {{ todo.category }}
-                    </span>
-                  </div>
                 </div>
                 
-                <div class="flex-shrink-0 flex gap-2">
+                <div class="flex-shrink-0 flex gap-2 items-center">
+                  <span v-if="todo.listName" class="flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-background dark:bg-dark-background text-sm text-text-secondary dark:text-dark-text-secondary font-medium line-through">
+                    <Icon icon="heroicons-outline:folder" class="h-4 w-4" />
+                    {{ todo.listName }}
+                  </span>
                   <button
                     @click="confirmDelete(todo)"
                     class="p-2 text-text-secondary dark:text-dark-text-secondary hover:text-red-500 dark:hover:text-red-400 transition-colors rounded-lg hover:bg-background dark:hover:bg-dark-background"
@@ -192,8 +188,7 @@
               
               <!-- List Dropdown -->
               <ListDropdown
-                v-if="!currentList"
-                v-model="newTodoCategory"
+                v-model="selectedListName"
                 :disabled="isAddingTodo"
               />
               
@@ -254,7 +249,7 @@ export default Vue.extend({
       showCompleted: true,
       newTodoTitle: '',
       newTodoDescription: '',
-      newTodoCategory: '',
+      selectedListName: 'General',
       initialLoading: false,
       isAddingTodo: false,
       error: null as string | null,
@@ -269,16 +264,16 @@ export default Vue.extend({
     }
   },
   computed: {
-    currentList(): string | null {
-      return this.$route.params.list ? decodeURIComponent(this.$route.params.list) : null
+    currentListName(): string | null {
+      return this.$route.params.list ? this.$route.params.list.replace(/_/g, ' ') : null
     },
     filteredTodos(): Todo[] {
-      const list = this.currentList
-      if (list) {
-        return this.allTodos.filter(t => t.category === list)
+      const listName = this.currentListName
+      if (listName) {
+        return this.allTodos.filter(t => t.listName === listName)
       }
-      // For General (home route), show todos with no category or empty category
-      return this.allTodos.filter(t => !t.category || t.category === '')
+      // For General (/ route)
+      return this.allTodos.filter(t => !t.listName || t.listName === '' || t.listName === 'General')
     },
     todos(): Todo[] {
       return this.filteredTodos.filter(t => !t.completed)
@@ -289,10 +284,13 @@ export default Vue.extend({
   },
   async mounted() {
     await this.fetchTodos()
+    // Set the dropdown to match the current list on initial load
+    this.selectedListName = this.currentListName || 'General'
   },
   watch: {
     '$route'() {
-      // When route changes, we already have all todos, just need to recompute filtered list
+      // When route changes, update the dropdown to match current list
+      this.selectedListName = this.currentListName || 'General'
     }
   },
   methods: {
@@ -314,22 +312,29 @@ export default Vue.extend({
       try {
         this.isAddingTodo = true
         this.error = null
-        
-        // Use the current list from the route if available, otherwise use selected category
-        const category = this.currentList || this.newTodoCategory || undefined
+
+        const listName = this.selectedListName || 'General'
         
         const newTodo = await todosApi.createTodo({
           title: this.newTodoTitle.trim(),
           description: this.newTodoDescription.trim(),
-          category: category
+          listName: listName
         })
         this.allTodos.push(newTodo)
         
         this.newTodoTitle = ''
         this.newTodoDescription = ''
-        // Only reset category if we're on the General page
-        if (!this.currentList) {
-          this.newTodoCategory = ''
+        
+        // Navigate to the list if it's different from the current one
+        const currentListOrGeneral = this.currentListName || 'General'
+        if (listName !== currentListOrGeneral) {
+          if (listName === 'General') {
+            this.$router.push('/')
+          } else {
+            this.$router.push(`/${listName.replace(/ /g, '_')}`)
+          }
+        } else {
+          this.selectedListName = this.currentListName || 'General'
         }
       } catch (err) {
         this.error = 'Failed to create todo'
