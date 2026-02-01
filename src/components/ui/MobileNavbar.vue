@@ -11,7 +11,7 @@
         <Icon icon="heroicons-outline:menu" class="w-6 h-6 text-text-main dark:text-dark-text-main" />
       </button>
       <h1 class="ml-3 text-lg font-bold text-text-main dark:text-dark-text-main flex items-center gap-0.5">
-        <Icon icon="heroicons-outline:clipboard-document-list" class="w-5 h-5 text-emerald-700 dark:text-emerald-600" />
+        <Icon icon="heroicons-outline:clipboard-document-list" class="w-5 h-5 text-logo" />
         AydinTodo
       </h1>
     </div>
@@ -31,7 +31,7 @@
         <!-- Header -->
         <div class="p-4 border-b border-border dark:border-dark-border flex items-center justify-between">
           <h1 class="text-xl font-bold flex items-center gap-0.5">
-            <Icon icon="heroicons-outline:clipboard-document-list" class="w-6 h-6 text-emerald-700 dark:text-emerald-600" />
+            <Icon icon="heroicons-outline:clipboard-document-list" class="w-6 h-6 text-logo" />
             AydinTodo
           </h1>
           <div class="flex items-center gap-2">
@@ -81,7 +81,7 @@
                 <button
                   v-if="!listHasTodos(listName)"
                   @click.stop.prevent="deleteList(listName)"
-                  class="p-1 text-text-secondary dark:text-dark-text-secondary hover:text-red-500 dark:hover:text-red-400 transition-colors rounded group-hover:text-white group-hover:hover:text-red-400"
+                  class="p-1 text-text-secondary dark:text-dark-text-secondary hover:text-error transition-colors rounded group-hover:text-white group-hover:hover:text-error"
                   title="Delete list"
                 >
                   <Icon icon="heroicons-outline:trash" class="h-4 w-4" />

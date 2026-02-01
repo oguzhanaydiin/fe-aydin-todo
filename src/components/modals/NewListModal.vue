@@ -20,7 +20,7 @@
             class="w-full px-4 py-2 bg-background dark:bg-dark-background border border-border dark:border-dark-border rounded-lg text-text-main dark:text-dark-text-main placeholder-text-secondary dark:placeholder-dark-text-secondary focus:outline-none focus:border-primary dark:focus:border-dark-primary"
           />
           <div class="mt-1 flex justify-between items-center">
-            <p v-if="displayError" class="text-xs text-red-500 dark:text-red-400">
+            <p v-if="displayError" class="text-xs text-error">
               {{ displayError }}
             </p>
             <span v-else class="text-xs text-text-secondary dark:text-dark-text-secondary">

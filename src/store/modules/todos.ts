@@ -1,6 +1,7 @@
 import { Module } from 'vuex'
 import { RootState } from '../types'
 import { todosApi, type Todo } from '@/services/api'
+import { toast } from '@/services/toast'
 
 export interface TodosState {
   todos: Todo[]
@@ -10,11 +11,11 @@ export interface TodosState {
 
 const todosModule: Module<TodosState, RootState> = {
   namespaced: true,
-  state: {
+  state: (): TodosState => ({
     todos: [],
     loading: false,
     error: null
-  },
+  }),
   mutations: {
     SET_TODOS(state, todos: Todo[]) {
       state.todos = todos
@@ -47,6 +48,7 @@ const todosModule: Module<TodosState, RootState> = {
         commit('SET_TODOS', todos)
       } catch (error) {
         console.error('Error fetching todos:', error)
+        toast.error('Failed to load todos')
         commit('SET_ERROR', 'Failed to load todos')
       } finally {
         commit('SET_LOADING', false)
@@ -60,6 +62,7 @@ const todosModule: Module<TodosState, RootState> = {
         return newTodo
       } catch (error: any) {
         const errorMessage = error.response?.data?.error || 'Failed to create todo'
+        toast.error(errorMessage)
         commit('SET_ERROR', errorMessage)
         throw new Error(errorMessage)
       }
@@ -72,6 +75,7 @@ const todosModule: Module<TodosState, RootState> = {
         return updatedTodo
       } catch (error: any) {
         const errorMessage = error.response?.data?.error || 'Failed to update todo'
+        toast.error(errorMessage)
         commit('SET_ERROR', errorMessage)
         throw new Error(errorMessage)
       }
@@ -83,6 +87,7 @@ const todosModule: Module<TodosState, RootState> = {
         commit('REMOVE_TODO', todoId)
       } catch (error: any) {
         const errorMessage = error.response?.data?.error || 'Failed to delete todo'
+        toast.error(errorMessage)
         commit('SET_ERROR', errorMessage)
         throw new Error(errorMessage)
       }

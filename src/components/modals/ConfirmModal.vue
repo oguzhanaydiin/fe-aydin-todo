@@ -87,7 +87,7 @@ export default Vue.extend({
   computed: {
     confirmClass(): string {
       if (this.variant === 'danger') {
-        return 'bg-red-500 text-white hover:enabled:bg-red-600'
+        return 'bg-error text-white hover:enabled:bg-error/90'
       }
       return 'bg-primary dark:bg-dark-primary text-white hover:enabled:opacity-90'
     }

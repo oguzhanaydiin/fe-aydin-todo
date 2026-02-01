@@ -37,7 +37,7 @@ export default Vue.extend({
   <nav class="hidden md:flex md:flex-col w-64 bg-surface dark:bg-dark-surface text-text-main dark:text-dark-text-main border-r border-border dark:border-dark-border">
     <div class="p-4 border-b border-border dark:border-dark-border flex items-center justify-between">
       <h1 class="text-xl font-bold flex items-center gap-0.5">
-        <Icon icon="heroicons-outline:clipboard-document-list" class="w-6 h-6 text-emerald-700 dark:text-emerald-600" />
+        <Icon icon="heroicons-outline:clipboard-document-list" class="w-6 h-6 text-logo" />
         AydinTodo
       </h1>
       <ColorModeToggle />
@@ -75,7 +75,7 @@ export default Vue.extend({
             <button
               v-if="!listHasTodos(listName)"
               @click.stop.prevent="confirmDeleteList(listName)"
-              class="p-1 text-text-secondary dark:text-dark-text-secondary hover:text-red-500 dark:hover:text-red-400 transition-colors rounded group-hover:text-white group-hover:hover:text-red-400"
+              class="p-1 text-text-secondary dark:text-dark-text-secondary hover:text-error transition-colors rounded group-hover:text-white group-hover:hover:text-error"
               title="Delete list"
             >
               <Icon icon="heroicons-outline:trash" class="h-4 w-4" />

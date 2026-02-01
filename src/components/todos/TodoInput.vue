@@ -69,7 +69,7 @@ export default Vue.extend({
             />
             <span 
               v-if="title.length === 100"
-              class="text-xs text-red-500 dark:text-red-400 font-medium flex-shrink-0"
+              class="text-xs text-error font-medium flex-shrink-0"
             >
               100/100
             </span>
@@ -86,7 +86,7 @@ export default Vue.extend({
             />
             <span 
               v-if="description.length === 100"
-              class="text-xs text-red-500 dark:text-red-400 font-medium flex-shrink-0"
+              class="text-xs text-error font-medium flex-shrink-0"
             >
               100/100
             </span>

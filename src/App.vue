@@ -4,6 +4,8 @@ import DesktopNavbar from '@/components/ui/DesktopNavbar.vue'
 import MobileNavbar from '@/components/ui/MobileNavbar.vue'
 import NewListModal from '@/components/modals/NewListModal.vue'
 import ConfirmModal from '@/components/modals/ConfirmModal.vue'
+import ToastContainer from '@/components/ui/ToastContainer.vue'
+import { toast } from '@/services/toast'
 
 export default Vue.extend({
   name: 'App',
@@ -11,7 +13,8 @@ export default Vue.extend({
     DesktopNavbar,
     MobileNavbar,
     NewListModal,
-    ConfirmModal
+    ConfirmModal,
+    ToastContainer
   },
   data() {
     return {
@@ -57,6 +60,7 @@ export default Vue.extend({
           this.$router.push('/')
         }
         
+        toast.success('List deleted')
         this.isDeleteListModalOpen = false
         this.listToDelete = null
       } catch (error: any) {
@@ -74,6 +78,7 @@ export default Vue.extend({
         this.isCreatingList = true
         this.createError = null
         await this.$store.dispatch('lists/addList', listName)
+        toast.success('List created')
         this.isNewListModalOpen = false
         // Navigate to the new list
         this.$router.push(`/${listName.replace(/ /g, '_')}`)
@@ -136,5 +141,7 @@ export default Vue.extend({
       @confirm="handleDeleteList"
       @cancel="cancelDeleteList"
     />
+
+    <ToastContainer />
   </div>
 </template>
