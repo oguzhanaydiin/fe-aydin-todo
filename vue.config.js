@@ -1,6 +1,5 @@
 // vue.config.js
 module.exports = {
-  publicPath: process.env.NODE_ENV === 'production'
-    ? '/fe-aydin-todo/'
-    : '/',
+  publicPath: process.env.VUE_APP_ENVIRONMENT === 'gh-pages'
+    ? '/fe-aydin-todo/' : '/',
 };
