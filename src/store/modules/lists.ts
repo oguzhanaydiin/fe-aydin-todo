@@ -10,11 +10,11 @@ export interface ListsState {
 
 const listsModule: Module<ListsState, RootState> = {
   namespaced: true,
-  state: {
+  state: (): ListsState => ({
     lists: [],
     loading: false,
     error: null
-  },
+  }),
   mutations: {
     SET_LISTS(state, lists: List[]) {
       state.lists = lists
