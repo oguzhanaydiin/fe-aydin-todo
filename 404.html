@@ -1,3 +1,8 @@
-<!-- For GitHub Pages SPA fallback: copy of index.html -->
-<script>window.location.replace('/fe-aydin-todo/' + 'index.html');</script>
+<!-- For GitHub Pages SPA fallback: redirect to root if not on / -->
+<script>
+	// If not on root, redirect to root
+	if (window.location.pathname !== '/fe-aydin-todo/' && window.location.pathname !== '/fe-aydin-todo/index.html') {
+		window.location.replace('/fe-aydin-todo/');
+	}
+</script>
 <!-- Optionally, you can copy the full content of your built index.html here for a seamless fallback. -->
