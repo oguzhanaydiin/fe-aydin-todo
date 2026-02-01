@@ -64,6 +64,9 @@ module.exports = {
     compress: true,
     port: 8080,
     hot: true,
-    historyApiFallback: true
+    historyApiFallback: true,
+    client: {
+      overlay: false  // Disable the error overlay popup
+    }
   }
 };

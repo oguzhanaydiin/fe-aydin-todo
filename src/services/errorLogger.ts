@@ -2,6 +2,9 @@ import axios from 'axios'
 import { toast } from './toast'
 
 const apiUrl = process.env.VUE_APP_AYDIN_TODO_API_URL
+const username = process.env.VUE_APP_AYDIN_TODO_API_USERNAME || ''
+const password = process.env.VUE_APP_AYDIN_TODO_API_PASSWORD || ''
+const credentials = btoa(`${username}:${password}`)
 
 interface ErrorPayload {
   source: 'frontend'
@@ -12,7 +15,11 @@ interface ErrorPayload {
 
 // Send error to backend
 const sendError = (payload: ErrorPayload): void => {
-  axios.post(`${apiUrl}/error-logs`, payload).catch(() => {
+  axios.post(`${apiUrl}/error-logs`, payload, {
+    headers: {
+      'Authorization': `Basic ${credentials}`,
+    },
+  }).catch(() => {
     // Silently fail - don't cause more errors
   })
 }
