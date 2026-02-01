@@ -113,6 +113,7 @@ import TodoInput from '@/components/todos/TodoInput.vue'
 import EmptyState from '@/components/ui/EmptyState.vue'
 import EditModal from '@/components/modals/EditModal.vue'
 import ConfirmModal from '@/components/modals/ConfirmModal.vue'
+import { toast } from '@/services/toast'
 
 export default Vue.extend({
   name: 'Home',
@@ -234,6 +235,7 @@ export default Vue.extend({
           }
         })
         
+        toast.success('Todo updated')
         this.cancelEdit()
       } catch (err) {
         console.error('Error updating todo:', err)
@@ -258,6 +260,7 @@ export default Vue.extend({
       try {
         this.isDeleting = true
         await this.$store.dispatch('todos/deleteTodo', this.todoToDelete._id)
+        toast.success('Todo deleted')
         this.cancelDelete()
       } catch (err) {
         console.error('Error deleting todo:', err)

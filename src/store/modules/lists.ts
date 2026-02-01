@@ -1,6 +1,7 @@
 import { Module } from 'vuex'
 import { RootState } from '../types'
 import { listsApi, type List } from '@/services/api'
+import { toast } from '@/services/toast'
 
 export interface ListsState {
   lists: List[]
@@ -41,6 +42,7 @@ const listsModule: Module<ListsState, RootState> = {
         commit('SET_LISTS', lists)
       } catch (error) {
         console.error('Error fetching lists:', error)
+        toast.error('Failed to load lists')
         commit('SET_ERROR', 'Failed to load lists')
       } finally {
         commit('SET_LOADING', false)
@@ -54,6 +56,7 @@ const listsModule: Module<ListsState, RootState> = {
         return newList
       } catch (error: any) {
         const errorMessage = error.response?.data?.error || 'Failed to create list'
+        toast.error(errorMessage)
         commit('SET_ERROR', errorMessage)
         throw new Error(errorMessage)
       }
@@ -65,6 +68,7 @@ const listsModule: Module<ListsState, RootState> = {
         commit('REMOVE_LIST', listName)
       } catch (error: any) {
         const errorMessage = error.response?.data?.error || 'Failed to delete list'
+        toast.error(errorMessage)
         commit('SET_ERROR', errorMessage)
         throw new Error(errorMessage)
       }
