@@ -1,0 +1,15 @@
+services:
+  # Production environment (~25MB image)
+  app:
+    build:
+      context: .
+      target: production
+      args:
+        - VUE_APP_AYDIN_TODO_API_URL=${VUE_APP_AYDIN_TODO_API_URL}
+        - VUE_APP_AYDIN_TODO_API_USERNAME=${VUE_APP_AYDIN_TODO_API_USERNAME}
+        - VUE_APP_AYDIN_TODO_API_PASSWORD=${VUE_APP_AYDIN_TODO_API_PASSWORD}
+    ports:
+      - "4000:80"
+    environment:
+      - NODE_ENV=production
+    restart: unless-stopped

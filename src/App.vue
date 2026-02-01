@@ -98,50 +98,56 @@ export default Vue.extend({
 
 <template>
   <div class="flex h-full">
-    <!-- Mobile navbar -->
-    <MobileNavbar
-      :is-open="isMobileMenuOpen"
-      :all-todos="allTodos"
-      @open="isMobileMenuOpen = true"
-      @close="isMobileMenuOpen = false"
-      @open-new-list="openNewListModal"
-      @delete-list="confirmDeleteList"
-    />
+    <template v-if="$route.name !== 'not-found'">
+      <!-- Mobile navbar -->
+      <MobileNavbar
+        :is-open="isMobileMenuOpen"
+        :all-todos="allTodos"
+        @open="isMobileMenuOpen = true"
+        @close="isMobileMenuOpen = false"
+        @open-new-list="openNewListModal"
+        @delete-list="confirmDeleteList"
+      />
 
-    <!-- Desktop Navbar -->
-    <DesktopNavbar
-      :lists="lists"
-      :all-todos="allTodos"
-      @open-new-list="openNewListModal"
-      @delete-list="confirmDeleteList"
-    />
+      <!-- Desktop Navbar -->
+      <DesktopNavbar
+        :lists="lists"
+        :all-todos="allTodos"
+        @open-new-list="openNewListModal"
+        @delete-list="confirmDeleteList"
+      />
 
-    <!-- Main content -->
-    <main class="flex-1 overflow-hidden pt-14 md:pt-0">
-      <router-view />
-    </main>
+      <!-- Main content -->
+      <main class="flex-1 overflow-hidden pt-14 md:pt-0">
+        <router-view />
+      </main>
 
-    <!-- New List Modal -->
-    <NewListModal
-      :is-open="isNewListModalOpen"
-      :loading="isCreatingList"
-      :external-error="createError"
-      @save="handleNewList"
-      @cancel="cancelNewList"
-    />
+      <!-- New List Modal -->
+      <NewListModal
+        :is-open="isNewListModalOpen"
+        :loading="isCreatingList"
+        :external-error="createError"
+        @save="handleNewList"
+        @cancel="cancelNewList"
+      />
 
-    <!-- Delete List Modal -->
-    <ConfirmModal
-      :is-open="isDeleteListModalOpen"
-      title="Delete List"
-      :message="`Are you sure you want to delete '${listToDelete}'?`"
-      :loading="isDeletingList"
-      loading-text="Deleting..."
-      variant="danger"
-      @confirm="handleDeleteList"
-      @cancel="cancelDeleteList"
-    />
-
+      <!-- Delete List Modal -->
+      <ConfirmModal
+        :is-open="isDeleteListModalOpen"
+        title="Delete List"
+        :message="`Are you sure you want to delete '${listToDelete}'?`"
+        :loading="isDeletingList"
+        loading-text="Deleting..."
+        variant="danger"
+        @confirm="handleDeleteList"
+        @cancel="cancelDeleteList"
+      />
+    </template>
+    <template v-else>
+      <main class="flex-1 flex items-center justify-center">
+        <router-view />
+      </main>
+    </template>
     <ToastContainer />
   </div>
 </template>
