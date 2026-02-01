@@ -1,6 +1,7 @@
 import axios from 'axios'
+import { toast } from './toast'
 
-const apiUrl = process.env.AYDIN_TODO_API_URL
+const apiUrl = process.env.VUE_APP_AYDIN_TODO_API_URL
 
 interface ErrorPayload {
   source: 'frontend'
@@ -40,7 +41,7 @@ const shouldIgnore = (error: Error | string): boolean => {
 }
 
 // Log unexpected errors only
-export const logError = (error: Error): void => {
+export const logError = (error: Error, showToast = true): void => {
   if (shouldIgnore(error)) return
 
   sendError({
@@ -49,6 +50,11 @@ export const logError = (error: Error): void => {
     stack: error.stack,
     route: window.location.pathname,
   })
+
+  // Show toast for unexpected errors
+  if (showToast) {
+    toast.error('Something went wrong. We have been notified.')
+  }
 }
 
 // Setup global error handlers

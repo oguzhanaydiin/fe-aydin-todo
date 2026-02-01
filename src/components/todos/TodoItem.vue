@@ -45,8 +45,8 @@ export default Vue.extend({
       @click="handleToggleComplete"
       class="flex-shrink-0 w-6 h-6 rounded border-2 transition-all shadow-sm flex items-center justify-center group"
       :class="isCompleted 
-        ? 'border-green-500 dark:border-green-400 bg-green-500 dark:bg-green-400 hover:border-border dark:hover:border-dark-border hover:bg-transparent' 
-        : 'border-border dark:border-dark-border hover:border-green-500 dark:hover:border-green-400 hover:bg-green-50 dark:hover:bg-green-900/20 hover:shadow'"
+        ? 'border-success bg-success hover:border-border dark:hover:border-dark-border hover:bg-transparent' 
+        : 'border-border dark:border-dark-border hover:border-success hover:bg-success/10 hover:shadow'"
       :title="isCompleted ? 'Mark as incomplete' : 'Mark as complete'"
     >
       <Icon 
@@ -54,7 +54,7 @@ export default Vue.extend({
         class="h-4 w-4 transition-colors"
         :class="isCompleted 
           ? 'text-white group-hover:text-transparent' 
-          : 'text-transparent group-hover:text-green-500 dark:group-hover:text-green-400'"
+          : 'text-transparent group-hover:text-success'"
       />
     </button>
 
@@ -93,7 +93,7 @@ export default Vue.extend({
       </button>
       <button
         @click="handleDelete"
-        class="p-2 text-text-secondary dark:text-dark-text-secondary hover:text-red-500 dark:hover:text-red-400 transition-colors rounded-lg hover:bg-background dark:hover:bg-dark-background"
+        class="p-2 text-text-secondary dark:text-dark-text-secondary hover:text-error transition-colors rounded-lg hover:bg-background dark:hover:bg-dark-background"
         title="Delete todo"
       >
         <Icon icon="heroicons-outline:trash" class="h-5 w-5" />

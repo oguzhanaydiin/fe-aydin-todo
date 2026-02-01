@@ -4,6 +4,7 @@ import DesktopNavbar from '@/components/ui/DesktopNavbar.vue'
 import MobileNavbar from '@/components/ui/MobileNavbar.vue'
 import NewListModal from '@/components/modals/NewListModal.vue'
 import ConfirmModal from '@/components/modals/ConfirmModal.vue'
+import ToastContainer from '@/components/ui/ToastContainer.vue'
 
 export default Vue.extend({
   name: 'App',
@@ -11,7 +12,8 @@ export default Vue.extend({
     DesktopNavbar,
     MobileNavbar,
     NewListModal,
-    ConfirmModal
+    ConfirmModal,
+    ToastContainer
   },
   data() {
     return {
@@ -136,5 +138,7 @@ export default Vue.extend({
       @confirm="handleDeleteList"
       @cancel="cancelDeleteList"
     />
+
+    <ToastContainer />
   </div>
 </template>

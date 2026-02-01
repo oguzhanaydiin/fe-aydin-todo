@@ -16,7 +16,7 @@ export default Vue.extend({
   computed: {
     textColorClass(): string {
       if (this.type === 'error') {
-        return 'text-red-500'
+        return 'text-error'
       }
       return 'text-text-secondary dark:text-dark-text-secondary'
     }
