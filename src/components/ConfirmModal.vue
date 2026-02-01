@@ -39,63 +39,70 @@
   </BaseModal>
 </template>
 
-<script setup lang="ts">
-import { computed } from 'vue'
+<script lang="ts">
+import Vue from 'vue'
 import BaseModal from './BaseModal.vue'
 
-const props = defineProps({
-  isOpen: {
-    type: Boolean,
-    required: true
+type ModalVariant = 'danger' | 'primary'
+
+export default Vue.extend({
+  name: 'ConfirmModal',
+  components: {
+    BaseModal
   },
-  title: {
-    type: String,
-    required: true
+  props: {
+    isOpen: {
+      type: Boolean,
+      required: true
+    },
+    title: {
+      type: String,
+      required: true
+    },
+    message: {
+      type: String,
+      required: true
+    },
+    confirmText: {
+      type: String,
+      default: 'Yes'
+    },
+    cancelText: {
+      type: String,
+      default: 'No'
+    },
+    loadingText: {
+      type: String,
+      default: 'Please wait...'
+    },
+    loading: {
+      type: Boolean,
+      default: false
+    },
+    variant: {
+      type: String as () => ModalVariant,
+      default: 'danger' as ModalVariant
+    }
   },
-  message: {
-    type: String,
-    required: true
+  computed: {
+    confirmClass(): string {
+      if (this.variant === 'danger') {
+        return 'bg-red-500 text-white hover:enabled:bg-red-600'
+      }
+      return 'bg-primary dark:bg-dark-primary text-white hover:enabled:opacity-90'
+    }
   },
-  confirmText: {
-    type: String,
-    default: 'Yes'
-  },
-  cancelText: {
-    type: String,
-    default: 'No'
-  },
-  loadingText: {
-    type: String,
-    default: 'Please wait...'
-  },
-  loading: {
-    type: Boolean,
-    default: false
-  },
-  variant: {
-    type: String as () => 'danger' | 'primary',
-    default: 'danger'
+  methods: {
+    onConfirm(): void {
+      if (!this.loading) {
+        this.$emit('confirm')
+      }
+    },
+    onCancel(): void {
+      if (!this.loading) {
+        this.$emit('cancel')
+      }
+    }
   }
 })
-
-const emit = defineEmits(['confirm', 'cancel'])
-
-const confirmClass = computed(() => {
-  if (props.variant === 'danger') {
-    return 'bg-red-500 text-white hover:enabled:bg-red-600'
-  }
-  return 'bg-primary dark:bg-dark-primary text-white hover:enabled:opacity-90'
-})
-
-const onConfirm = () => {
-  if (!props.loading) {
-    emit('confirm')
-  }
-}
-
-const onCancel = () => {
-  if (!props.loading) {
-    emit('cancel')
-  }
-}
 </script>

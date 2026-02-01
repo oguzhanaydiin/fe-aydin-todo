@@ -1,15 +1,24 @@
-<script setup lang="ts">
-import { ref, onMounted } from 'vue'
-import { useThemeStore } from '@/stores/theme'
+<script lang="ts">
+import Vue from 'vue'
 import ColorModeToggle from '@/components/ColorModeToggle.vue'
 import MobileDrawer from '@/components/MobileDrawer.vue'
 import IconMenu from '@/components/icons/IconMenu.vue'
 
-const themeStore = useThemeStore()
-const isMobileMenuOpen = ref(false)
-
-onMounted(() => {
-  themeStore.init()
+export default Vue.extend({
+  name: 'App',
+  components: {
+    ColorModeToggle,
+    MobileDrawer,
+    IconMenu
+  },
+  data() {
+    return {
+      isMobileMenuOpen: false
+    }
+  },
+  mounted() {
+    this.$store.dispatch('init')
+  }
 })
 </script>
 

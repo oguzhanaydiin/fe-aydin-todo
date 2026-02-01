@@ -50,37 +50,46 @@
   </div>
 </template>
 
-<script setup lang="ts">
-import { watch, ref } from 'vue'
+<script lang="ts">
+import Vue from 'vue'
 import ColorModeToggle from '@/components/ColorModeToggle.vue'
 
-const props = defineProps({
-  isOpen: {
-    type: Boolean,
-    required: true
+export default Vue.extend({
+  name: 'MobileDrawer',
+  components: {
+    ColorModeToggle
+  },
+  props: {
+    isOpen: {
+      type: Boolean,
+      required: true
+    }
+  },
+  data() {
+    return {
+      isVisible: false,
+      isAnimating: false
+    }
+  },
+  watch: {
+    isOpen(newVal: boolean) {
+      if (newVal) {
+        this.isVisible = true
+        setTimeout(() => {
+          this.isAnimating = true
+        }, 10)
+      } else {
+        this.isAnimating = false
+        setTimeout(() => {
+          this.isVisible = false
+        }, 300)
+      }
+    }
+  },
+  methods: {
+    close(): void {
+      this.$emit('close')
+    }
   }
 })
-
-const emit = defineEmits(['close'])
-
-const isVisible = ref(false)
-const isAnimating = ref(false)
-
-watch(() => props.isOpen, (newVal) => {
-  if (newVal) {
-    isVisible.value = true
-    setTimeout(() => {
-      isAnimating.value = true
-    }, 10)
-  } else {
-    isAnimating.value = false
-    setTimeout(() => {
-      isVisible.value = false
-    }, 300)
-  }
-})
-
-const close = () => {
-  emit('close')
-}
 </script>
