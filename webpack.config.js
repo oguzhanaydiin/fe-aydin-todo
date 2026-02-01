@@ -49,7 +49,9 @@ module.exports = {
       template: './public/index.html'
     }),
     new webpack.DefinePlugin({
-      'process.env.VUE_APP_AYDIN_TODO_API_URL': JSON.stringify(process.env.VUE_APP_AYDIN_TODO_API_URL)
+      'process.env.VUE_APP_AYDIN_TODO_API_URL': JSON.stringify(process.env.VUE_APP_AYDIN_TODO_API_URL),
+      'process.env.VUE_APP_AYDIN_TODO_API_USERNAME': JSON.stringify(process.env.VUE_APP_AYDIN_TODO_API_USERNAME),
+      'process.env.VUE_APP_AYDIN_TODO_API_PASSWORD': JSON.stringify(process.env.VUE_APP_AYDIN_TODO_API_PASSWORD),
     })
   ],
   resolve: {
