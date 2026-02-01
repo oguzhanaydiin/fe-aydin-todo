@@ -43,7 +43,7 @@ const routes: Array<RouteConfig> = [
 
 const router = new VueRouter({
   mode: 'history',
-  base: '/',
+  base: process.env.VUE_APP_ENVIRONMENT === 'gh-pages' ? '/fe-aydin-todo/' : '/',
   routes
 })
 
