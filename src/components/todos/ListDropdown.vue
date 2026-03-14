@@ -57,7 +57,7 @@ export default Vue.extend({
   computed: {
     position() {
       if (!this.isOpen) return {}
-      // get the position of the button position
+      // Get the button position
       const btn = this.$refs.button as HTMLElement
       if (!btn) return {}
       const rect = btn.getBoundingClientRect()
@@ -73,7 +73,7 @@ export default Vue.extend({
   },
   methods: {
     selectList(listName: string) {
-      // changes v-model value
+      // Emit input event to update v-model
       this.$emit('input', listName)
       this.isOpen = false
     }

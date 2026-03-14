@@ -59,19 +59,19 @@ export const todosApi = {
     return response.data.data
   },
 
-  // Create one
+  // Create a todo
   createTodo: async (todo: CreateTodo): Promise<Todo> => {
     const response = await apiClient.post<ApiResponse<Todo>>('/todos', todo)
     return response.data.data
   },
 
-  // Update one
+  // Update a todo
   updateTodo: async (id: string, todo: UpdateTodo): Promise<Todo> => {
     const response = await apiClient.put<ApiResponse<Todo>>(`/todos/${id}`, todo)
     return response.data.data
   },
 
-  // Delete one
+  // Delete a todo
   deleteTodo: async (id: string): Promise<void> => {
     await apiClient.delete(`/todos/${id}`)
   },
